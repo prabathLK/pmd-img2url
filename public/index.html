@@ -9,13 +9,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/lucide.min.js"></script>
-
     <style>
         :root {
             --bg-black: #000000;
-            --bg-primary: #0A0A0A;
-            --bg-secondary: #111111;
+            --bg-primary: rgba(16, 16, 16, 0.7);
+            --bg-secondary: rgba(255, 255, 255, 0.05);
             --border-color: rgba(255, 255, 255, 0.1);
             --text-primary: #EAEAEA;
             --text-secondary: #888888;
@@ -43,7 +41,7 @@
         .container {
             width: 100%;
             max-width: 650px;
-            background: rgba(16, 16, 16, 0.7);
+            background: var(--bg-primary);
             border-radius: 16px;
             border: 1px solid var(--border-color);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
@@ -89,7 +87,7 @@
             gap: 1rem;
         }
         .stat-box {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             padding: 1.25rem;
             border-radius: 12px;
@@ -104,8 +102,9 @@
             align-items: center;
             gap: 6px;
         }
-        .stat-box h3 i {
+        .stat-box .icon {
              width: 14px; height: 14px; color: var(--text-secondary);
+             stroke-width: 2.5;
         }
         .stat-box p {
             font-size: 1.75rem;
@@ -137,17 +136,18 @@
             justify-content: center;
             text-align: center;
             cursor: pointer;
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--bg-secondary);
             transition: all 0.3s ease;
         }
         .drop-zone.drag-over {
             border-color: var(--accent-blue);
             background: rgba(59, 130, 246, 0.1);
         }
-        .drop-zone i {
+        .drop-zone .icon {
             width: 36px; height: 36px;
             color: var(--text-secondary);
             margin-bottom: 1rem;
+            stroke-width: 2;
         }
         .drop-zone p { font-size: 1rem; font-weight: 500; color: var(--text-primary); }
         .drop-zone span { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem; }
@@ -195,7 +195,7 @@
             padding: 0.75rem 1rem;
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             cursor: pointer;
@@ -253,14 +253,41 @@
                 <h2>Live Statistics</h2>
                 <div class="stats-grid">
                     <div class="stat-box" style="grid-column: span 2;">
-                        <h3><i data-lucide="database"></i>Storage Used (10GB)</h3>
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="icon"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+                            Storage Used (10GB)
+                        </h3>
                         <p id="stats-storage">--</p>
                         <div class="storage-bar-container"><div class="storage-bar-fill" id="storage-bar"></div></div>
                     </div>
-                    <div class="stat-box"><h3><i data-lucide="file-image"></i>Available</h3><p id="stats-available">--</p></div>
-                    <div class="stat-box"><h3><i data-lucide="trash-2"></i>Auto-Deleted</h3><p id="stats-deleted">--</p></div>
-                    <div class="stat-box"><h3><i data-lucide="arrow-up-circle"></i>Uploads</h3><p id="stats-uploads">--</p></div>
-                    <div class="stat-box"><h3><i data-lucide="eye"></i>Views</h3><p id="stats-views">--</p></div>
+                    <div class="stat-box">
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="icon"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+                            Available
+                        </h3>
+                        <p id="stats-available">--</p>
+                    </div>
+                    <div class="stat-box">
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="icon"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                            Auto-Deleted
+                        </h3>
+                        <p id="stats-deleted">--</p>
+                    </div>
+                    <div class="stat-box">
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                            Uploads
+                        </h3>
+                        <p id="stats-uploads">--</p>
+                    </div>
+                    <div class="stat-box">
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            Views
+                        </h3>
+                        <p id="stats-views">--</p>
+                    </div>
                 </div>
             </section>
 
@@ -268,7 +295,7 @@
                 <h2>Upload New Image</h2>
                 <form id="upload-form">
                     <label for="file-input" class="drop-zone" id="drop-zone-area">
-                        <i data-lucide="upload-cloud"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="icon"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"></path><line x1="16" y1="5" x2="22" y2="5"></line><line x1="19" y1="2" x2="19" y2="8"></line><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>
                         <p>Drag & drop your file here</p>
                         <span>or click to select (Max 2MB)</span>
                     </label>
@@ -313,8 +340,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-        
-            lucide.createIcons();
             
             const uploadForm = document.getElementById('upload-form');
             const fileInput = document.getElementById('file-input');
