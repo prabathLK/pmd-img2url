@@ -68,8 +68,10 @@ router.post('/', (req, res) => {
       stats.totalUploads += 1;
       await stats.save();
 
-      const viewUrl = `${process.env.BASE_URL}/v/${fileKey}`;
-            res.status(200).json({ url: viewUrl });
+     const baseUrl = process.env.BASE_URL
+      const viewUrl = `${baseUrl}/v/${fileKey}`;
+      
+      res.status(200).json({ url: viewUrl });
 
     } catch (e) {
       console.error(e);
