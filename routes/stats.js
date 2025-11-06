@@ -8,12 +8,18 @@ router.get('/', async (req, res) => {
   try {
     const stats = await getStats();
     const currentAvailable = await Image.countDocuments();
+    
+    const agg = await Image.aggregate([
+      { $group: { _id: null, totalStorage: { $sum: "$fileSize" } } }
+    ]);
+    const currentStorage = agg[0]?.totalStorage || 0;
 
     res.status(200).json({
       totalUploads: stats.totalUploads,
       totalViews: stats.totalViews,
       totalDeletes: stats.totalDeletes,
-      currentAvailable: currentAvailable
+      currentAvailable: currentAvailable,
+      currentStorage: currentStorage
     });
   } catch (e) {
     console.error(e);
