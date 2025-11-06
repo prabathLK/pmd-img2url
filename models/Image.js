@@ -10,6 +10,10 @@ const ImageSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  fileSize: {
+    type: Number,
+    required: true,
+  },
   uploadDate: {
     type: Date,
     default: Date.now,
