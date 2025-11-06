@@ -9,8 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/lucide.min.js"></script>
-
     <style>
         :root {
             --bg-black: #000000;
@@ -25,7 +23,6 @@
             --accent-green: #22C55E;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-black);
@@ -191,6 +188,39 @@
             background: rgba(239, 68, 68, 0.1); color: var(--accent-red);
             border: 1px solid rgba(239, 68, 68, 0.5); display: block;
         }
+        .message-success-text {
+            color: var(--accent-green);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .url-copy-box {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .url-copy-box:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .url-copy-box span {
+            font-family: "SFMono-Regular", Consolas, monospace;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            word-break: break-all;
+        }
+        .url-copy-box .copy-status {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
         
         .api-section h3 { font-size: 1rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; }
         .api-section p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem; }
@@ -210,8 +240,7 @@
             -webkit-text-fill-color: transparent;
             text-decoration: none; font-weight: 600;
         }
-
-        /* === අලුත් Popup Modal Style === */
+        
         #popup-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -310,7 +339,7 @@
                     </div>
                     <div class="stat-box">
                         <h3>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="icon"><circle cx="12" cy="12" r="10"></circle><polyline points="16 12 12 8 8 12"></polyline><line x1="12" y1="16" x2="12" y2="8"></line></svg>
                             Uploads
                         </h3>
                         <p id="stats-uploads">--</p>
@@ -329,7 +358,7 @@
                 <h2>Upload New Image</h2>
                 <form id="upload-form">
                     <label for="file-input" class="drop-zone" id="drop-zone-area">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="icon"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"></path><line x1="16" y1="5" x2="22" y2="5"></line><line x1="19" y1="2" x2="19" y2="8"></line><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="icon"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M12 12v9"></path><path d="m16 16-4-4-4 4"></path></svg>
                         <p>Drag & drop your file here</p>
                         <span>or click to select (Max 2MB)</span>
                     </label>
@@ -388,8 +417,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            
-            lucide.createIcons();
             
             const uploadForm = document.getElementById('upload-form');
             const fileInput = document.getElementById('file-input');
