@@ -69,12 +69,7 @@ router.post('/', (req, res) => {
       await stats.save();
 
       const viewUrl = `${process.env.BASE_URL}/v/${fileKey}`;
-      
-      if (req.accepts('html')) {
-        res.redirect('/?success=true&url=' + encodeURIComponent(viewUrl));
-      } else {
-        res.status(200).json({ url: viewUrl });
-      }
+            res.status(200).json({ url: viewUrl });
 
     } catch (e) {
       console.error(e);
