@@ -1,6 +1,7 @@
 import express from 'express';
 import Image from '../models/Image.js';
 import { BUCKET_NAME } from '../config/s3Client.js';
+import { getStats } from '../models/Stats.js';
 
 const router = express.Router();
 
@@ -15,9 +16,16 @@ router.get('/:key', async (req, res) => {
     }
 
     image.lastAccessedDate = Date.now();
-    await image.save();
+    
+    const stats = await getStats();
+    stats.totalViews += 1;
+    
+    await Promise.all([
+        image.save(),
+        stats.save()
+    ]);
 
-        const r2Url = `${process.env.R2_PUBLIC_URL}/${BUCKET_NAME}/${image.fileKey}`;
+    const r2Url = `${process.env.R2_PUBLIC_URL}/${BUCKET_NAME}/${image.fileKey}`;
 
     res.redirect(302, r2Url);
 
