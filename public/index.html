@@ -6,184 +6,303 @@
     <title>pmd-img2url - Dashboard</title>
     <style>
         :root {
-            --bg-black: #000000;
-            --bg-primary: #0A0A0A;
-            --bg-secondary: #111111;
-            --border-color: #222222;
-            --text-primary: #EAEAEA;
-            --text-secondary: #888888;
-            --accent-blue: #3B82F6;
-            --accent-purple: #8B5CF6;
+            --dark-primary: #111827;  /* Main Background */
+            --dark-secondary: #1F2937; /* Card Background */
+            --dark-tertiary: #374151; /* Stat Box Background */
+            --border-color: #4B5563;
+            --text-primary: #F3F4F6;
+            --text-secondary: #9CA3AF;
+            --accent-green: #22C55E; /* Premium Green */
+            --accent-green-hover: #16A34A;
             --accent-red: #EF4444;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-black);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--dark-primary);
             color: var(--text-primary);
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 3rem 1rem;
+            padding: 2rem 1rem;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
+
         .container {
             width: 100%;
-            max-width: 650px;
-            background: var(--bg-primary);
+            max-width: 700px;
+            background: var(--dark-secondary);
             border-radius: 16px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 25px 50px -12px rgba(255, 255, 255, 0.03);
-            margin-bottom: 2rem;
-            overflow: hidden;
+            padding: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(34, 197, 94, 0.05);
         }
+
         header {
-            padding: 2rem 2rem 1.5rem 2rem;
-            border-bottom: 1px solid var(--border-color);
             text-align: center;
-            background: rgba(255, 255, 255, 0.02);
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1.5rem;
         }
+
         header h1 {
-            font-size: 2rem;
+            font-size: 2.25rem;
             font-weight: 800;
-            letter-spacing: -1px;
         }
+
         header h1 span {
-            background-image: linear-gradient(to right, var(--accent-purple), var(--accent-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--accent-green);
         }
+
         header p {
             font-size: 0.9rem;
             color: var(--text-secondary);
             margin-top: 0.25rem;
         }
-        main {
-            padding: 1.5rem 2rem;
-        }
+
         h2 {
-            font-size: 1.1rem;
+            font-size: 1.25rem;
             font-weight: 600;
             color: var(--text-primary);
-            margin: 1rem 0;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
             padding-bottom: 0.5rem;
         }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
             gap: 1rem;
         }
+
         .stat-box {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            padding: 1.25rem;
+            background: var(--dark-tertiary);
+            padding: 1.5rem 1rem;
             border-radius: 12px;
-            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
         }
+        
+        .stat-box:hover {
+             transform: translateY(-5px);
+             box-shadow: 0 0 20px rgba(34, 197, 94, 0.1);
+        }
+
+        .stat-box .icon {
+            width: 24px;
+            height: 24px;
+            color: var(--accent-green);
+        }
+
         .stat-box h3 {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: 500;
             color: var(--text-secondary);
-            margin-bottom: 0.5rem;
         }
+
         .stat-box p {
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--text-primary);
         }
+        
         .storage-bar-container {
-            background: var(--bg-black);
+            background: var(--dark-primary);
             border-radius: 8px;
             overflow: hidden;
             height: 10px;
-            margin-top: 0.75rem;
-            border: 1px solid var(--border-color);
+            margin-top: 0.5rem;
         }
         .storage-bar-fill {
-            background-image: linear-gradient(to right, var(--accent-blue), var(--accent-purple));
+            background-color: var(--accent-green);
             height: 100%;
             width: 0%;
             transition: width 0.5s ease-out;
         }
-        .uploader-section, .api-section { margin-top: 1.5rem; }
+
+        .uploader-section, .api-section {
+            margin-top: 2rem;
+        }
+        
         .drop-zone {
             border: 2px dashed var(--border-color);
             border-radius: 12px;
-            padding: 2.5rem;
+            padding: 2rem;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
             cursor: pointer;
-            background: var(--bg-secondary);
+            background: var(--dark-primary);
             transition: all 0.3s ease;
         }
         .drop-zone.drag-over {
-            border-color: var(--accent-blue);
-            background: rgba(59, 130, 246, 0.05);
+            border-color: var(--accent-green);
+            background: rgba(34, 197, 94, 0.1);
         }
-        .drop-zone p { font-size: 1rem; font-weight: 500; color: var(--text-primary); }
-        .drop-zone span { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem; }
-        #file-input { display: none; }
-        #file-name-display { font-size: 0.9rem; color: var(--text-secondary); margin-top: 1rem; text-align: center; }
+        .drop-zone .upload-icon {
+            width: 48px;
+            height: 48px;
+            color: var(--accent-green);
+            margin-bottom: 1rem;
+        }
+        .drop-zone p {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        .drop-zone span {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+        #file-input {
+            display: none;
+        }
+        #file-name-display {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 1rem;
+            text-align: center;
+        }
         
         .upload-button {
-            display: flex; align-items: center; justify-content: center;
-            width: 100%; padding: 0.9rem 1rem; margin-top: 1.5rem;
-            background-image: linear-gradient(to right, var(--accent-purple), var(--accent-blue));
-            background-size: 200% auto;
-            color: white;
-            border: none; border-radius: 8px; cursor: pointer;
-            font-size: 1rem; font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0.8rem 1rem;
+            margin-top: 1.5rem;
+            background: var(--accent-green);
+            color: var(--dark-primary);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 700;
             transition: all 0.3s ease;
         }
-        .upload-button:hover:not(:disabled) { background-position: right center; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2); }
+        .upload-button:hover:not(:disabled) {
+            background: var(--accent-green-hover);
+            transform: scale(1.02);
+        }
         .upload-button:disabled {
-            background: var(--bg-secondary);
+            background: var(--dark-tertiary);
             color: var(--text-secondary);
             cursor: not-allowed;
-            background-image: none;
         }
+        
         .spinner {
-            width: 16px; height: 16px; border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white; border-radius: 50%;
-            animation: spin 1s linear infinite; display: none; margin-right: 0.5rem;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: var(--dark-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+            margin-right: 0.5rem;
         }
-        .upload-button.uploading .spinner { display: block; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .upload-button.uploading .spinner {
+            display: block;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
         
-        .message-area { margin-top: 1.5rem; text-align: center; }
-        .message { padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.9rem; font-weight: 500; display: none; word-break: break-all; }
-        .message.success { background: rgba(34, 197, 94, 0.1); color: var(--accent-green); display: block; border: 1px solid rgba(34, 197, 94, 0.5); }
-        .message.error { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); display: block; border: 1px solid rgba(239, 68, 68, 0.5); }
-        .message a { color: var(--text-primary); font-weight: 700; text-decoration: underline; margin-left: 0.5rem; }
+        .message-area {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+        .message {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: none;
+            word-break: break-all;
+        }
+        .message.success {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--accent-green);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+        }
+        .message.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+            display: block;
+        }
+        .message .copy-button {
+            background: var(--accent-green);
+            color: var(--dark-primary);
+            border: none;
+            border-radius: 4px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 1rem;
+        }
         
-        .api-section h3 { font-size: 1rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; }
-        .api-section p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem; }
+        .api-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .api-section p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
         pre {
-            background: var(--bg-black); border: 1px solid var(--border-color);
-            border-radius: 8px; padding: 1rem; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-            font-size: 0.85rem; overflow-x: auto;
+            background: var(--dark-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
         code .comment { color: #6A9955; }
-        code .keyword { color: var(--accent-blue); }
+        code .keyword { color: var(--accent-green); }
         code .string { color: #CE9178; }
         code .variable { color: #9CDCFE; }
 
-        footer { margin-top: 2rem; color: var(--text-secondary); font-size: 0.9rem; text-align: center; }
+        footer {
+            margin-top: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-align: center;
+        }
         footer a {
-            background-image: linear-gradient(to right, var(--accent-purple), var(--accent-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-decoration: none; font-weight: 600;
+            color: var(--accent-green);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        footer a:hover {
+            text-decoration: underline;
         }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide-icons"></script>
 </head>
 <body>
 
@@ -191,22 +310,54 @@
         
         <header>
             <h1><span>pmd</span>-img2url</h1>
-            <p>Image Service for PRABATH-MD by Prabath Kumara</p>
+            <p>Image service for PRABATH-MD by Prabath Kumara</p>
         </header>
         
         <main>
             <section class="stats-section">
                 <h2>Live Statistics</h2>
                 <div class="stats-grid">
+                    
                     <div class="stat-box" style="grid-column: span 2;">
-                        <h3>Storage Used (10GB)</h3>
+                        <h3>
+                            <i data-lucide="database" style="width: 16px; height: 16px; vertical-align: text-top; margin-right: 4px;"></i>
+                            Storage Used (10GB)
+                        </h3>
                         <p id="stats-storage">--</p>
                         <div class="storage-bar-container"><div class="storage-bar-fill" id="storage-bar"></div></div>
                     </div>
-                    <div class="stat-box"><h3>Available</h3><p id="stats-available">--</p></div>
-                    <div class="stat-box"><h3>Auto-Deleted</h3><p id="stats-deleted">--</p></div>
-                    <div class="stat-box"><h3>Uploads</h3><p id="stats-uploads">--</p></div>
-                    <div class="stat-box"><h3>Views</h3><p id="stats-views">--</p></div>
+
+                    <div class="stat-box">
+                        <h3>
+                            <i data-lucide="file-image" style="width: 16px; height: 16px; vertical-align: text-top; margin-right: 4px;"></i>
+                            Available
+                        </h3>
+                        <p id="stats-available">--</p>
+                    </div>
+
+                    <div class="stat-box">
+                        <h3>
+                            <i data-lucide="trash-2" style="width: 16px; height: 16px; vertical-align: text-top; margin-right: 4px;"></i>
+                            Auto-Deleted
+                        </h3>
+                        <p id="stats-deleted">--</p>
+                    </div>
+
+                    <div class="stat-box">
+                        <h3>
+                            <i data-lucide="arrow-up-circle" style="width: 16px; height: 16px; vertical-align: text-top; margin-right: 4px;"></i>
+                            Uploads
+                        </h3>
+                        <p id="stats-uploads">--</p>
+                    </div>
+                    
+                    <div class="stat-box">
+                        <h3>
+                            <i data-lucide="eye" style="width: 16px; height: 16px; vertical-align: text-top; margin-right: 4px;"></i>
+                            Views
+                        </h3>
+                        <p id="stats-views">--</p>
+                    </div>
                 </div>
             </section>
 
@@ -214,6 +365,7 @@
                 <h2>Upload New Image</h2>
                 <form id="upload-form">
                     <label for="file-input" class="drop-zone" id="drop-zone-area">
+                        <i data-lucide="upload-cloud" class="upload-icon" style="width: 40px; height: 40px; color: var(--text-secondary); margin-bottom: 1rem;"></i>
                         <p>Drag & drop your file here</p>
                         <span>or click to select (Max 2MB)</span>
                     </label>
@@ -229,13 +381,16 @@
             
             <section class="api-section">
                 <h2>API for Developers</h2>
-                <h3>Upload a File (`POST /upload`)</h3>
-                <p>Send a `multipart/form-data` request with a field named `file` (max 2MB).</p>
+                <h3>Upload Endpoint</h3>
+                <p>Send a `multipart/form-data` request to the endpoint below with a field named `file` (max 2MB).</p>
+                <pre><code><span class="keyword">POST</span> <span id="api-upload-url"></span></code></pre>
+
+                <h3>JavaScript Example</h3>
                 <pre><code><span class="comment">// Example: JavaScript Fetch</span>
 <span class="keyword">const</span> <span class="variable">formData</span> = <span class="keyword">new</span> FormData();
 <span class="variable">formData</span>.append(<span class="string">'file'</span>, <span class="variable">yourFileObject</span>);
 
-<span class="keyword">const</span> <span class="variable">response</span> = <span class="keyword">await</span> fetch(<span class="string">'/upload'</span>, {
+<span class="keyword">const</span> <span class="variable">response</span> = <span class="keyword">await</span> fetch(<span class="string" id="api-fetch-url"></span>, {
   method: <span class="string">'POST'</span>,
   body: <span class="variable">formData</span>
 });
@@ -245,8 +400,9 @@
 <span class="comment">// Error:   { error: "File too large..." }</span>
 </code></pre>
                 
-                <h3>View / Download (`GET /v/:key`)</h3>
+                <h3>View / Download Endpoint</h3>
                 <p>Access the `url` from the success response. This logs the access (for the 30-day auto-delete) and redirects to the high-speed R2 file.</p>
+                <pre><code><span class="keyword">GET</span> /v/:key</code></pre>
             </section>
         </main>
 
@@ -266,6 +422,15 @@
         
         const FILE_SIZE_LIMIT = 2 * 1024 * 1024;
         const STORAGE_LIMIT_BYTES = 10 * 1024 * 1024 * 1024;
+        
+        const API_ENDPOINT = `${window.location.origin}/upload`;
+
+        function formatNumber(num) {
+            if (num < 1000) return num;
+            if (num < 1000000) return (num / 1000).toFixed(1).replace('.0', '') + 'K';
+            if (num < 1000000000) return (num / 1000000).toFixed(1).replace('.0', '') + 'M';
+            return (num / 1000000000).toFixed(1).replace('.0', '') + 'B';
+        }
 
         function formatBytes(bytes, decimals = 2) {
             if (bytes === 0) return '0 Bytes';
@@ -288,21 +453,40 @@
                 document.getElementById('storage-bar').style.width = `${storagePercent}%`;
                 if(storagePercent > 90) document.getElementById('storage-bar').style.backgroundColor = 'var(--accent-red)';
                 
-                document.getElementById('stats-available').innerText = data.currentAvailable;
-                document.getElementById('stats-deleted').innerText = data.totalDeletes;
-                document.getElementById('stats-uploads').innerText = data.totalUploads;
-                document.getElementById('stats-views').innerText = data.totalViews;
+                document.getElementById('stats-available').innerText = formatNumber(data.currentAvailable);
+                document.getElementById('stats-deleted').innerText = formatNumber(data.totalDeletes);
+                document.getElementById('stats-uploads').innerText = formatNumber(data.totalUploads);
+                document.getElementById('stats-views').innerText = formatNumber(data.totalViews);
             } catch (err) { console.error('Failed to fetch stats:', err); }
+        }
+
+        function copyToClipboard(text, buttonEl) {
+            navigator.clipboard.writeText(text).then(() => {
+                buttonEl.textContent = 'Copied!';
+                setTimeout(() => { buttonEl.textContent = 'Copy URL'; }, 2000);
+            }, (err) => {
+                buttonEl.textContent = 'Error';
+            });
         }
 
         function showMessage(type, text, url = null) {
             messageArea.innerHTML = '';
             const messageEl = document.createElement('div');
             messageEl.className = `message ${type}`;
-            let content = text;
-            if (url) { content += ` <a href="${url}" target="_blank">View URL</a>`; }
+            
+            let content = `<span>${text}</span>`;
+            if (url) {
+                content = `<span>Success! <a href="${url}" target="_blank" style="color: var(--text-primary); text-decoration: none;">${url}</a></span>
+                           <button class="copy-button" data-url="${url}">Copy URL</button>`;
+            }
             messageEl.innerHTML = content;
             messageArea.appendChild(messageEl);
+
+            if (url) {
+                messageEl.querySelector('.copy-button').addEventListener('click', (e) => {
+                    copyToClipboard(e.target.dataset.url, e.target);
+                });
+            }
         }
         
         function clearMessage() { messageArea.innerHTML = ''; }
@@ -348,11 +532,11 @@
             formData.append('file', file);
             
             try {
-                const response = await fetch('/upload', { method: 'POST', body: formData });
+                const response = await fetch(API_ENDPOINT, { method: 'POST', body: formData });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Upload failed');
                 
-                showMessage('success', 'Upload Successful!', data.url);
+                showMessage('success', '', data.url);
                 fetchStats();
                 uploadForm.reset();
                 fileNameDisplay.textContent = '';
@@ -365,8 +549,15 @@
                 uploadButton.querySelector('.button-text').textContent = 'Upload Image';
             }
         });
+        
+        function initApiDocs() {
+            document.getElementById('api-upload-url').textContent = API_ENDPOINT;
+            document.getElementById('api-fetch-url').textContent = API_ENDPOINT;
+        }
 
+        lucide.createIcons();
         fetchStats();
+        initApiDocs();
     </script>
 </body>
 </html>
