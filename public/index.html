@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <script src="https://unpkg.com/lucide-static@latest/dist/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/lucide.min.js"></script>
 
     <style>
         :root {
@@ -188,8 +188,6 @@
             background: rgba(239, 68, 68, 0.1); color: var(--accent-red);
             border: 1px solid rgba(239, 68, 68, 0.5); display: block;
         }
-
-        /* === 1. අලුත් "Liquid Glass" Copy Box එක === */
         .url-copy-box {
             display: flex;
             align-items: center;
@@ -228,7 +226,6 @@
             border-radius: 8px; padding: 1rem; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
             font-size: 0.85rem; overflow-x: auto;
         }
-        code .comment { color: #6A9955; }
         code .keyword { color: var(--accent-blue); }
         code .string { color: #CE9178; }
         code .variable { color: #9CDCFE; }
@@ -292,8 +289,7 @@
                 <pre><code><span class="keyword">POST</span> <span id="api-upload-url">...</span></code></pre>
 
                 <h3>JavaScript Example</h3>
-                <pre><code><span class="comment">// Example: JavaScript Fetch</span>
-<span class="keyword">const</span> <span class="variable">formData</span> = <span class="keyword">new</span> FormData();
+                <pre><code><span class="keyword">const</span> <span class="variable">formData</span> = <span class="keyword">new</span> FormData();
 <span class="variable">formData</span>.append(<span class="string">'file'</span>, <span class="variable">yourFileObject</span>);
 
 <span class="keyword">const</span> <span class="variable">response</span> = <span class="keyword">await</span> fetch(<span class="string" id="api-fetch-url">...</span>, {
@@ -301,9 +297,6 @@
   body: <span class="variable">formData</span>
 });
 <span class="keyword">const</span> <span class="variable">data</span> = <span class="keyword">await</span> <span class="variable">response</span>.json();
-
-<span class="comment">// Success: { url: "https://.../v/key" }</span>
-<span class="comment">// Error:   { error: "File too large..." }</span>
 </code></pre>
                 
                 <h3>View / Download Endpoint</h3>
@@ -315,12 +308,14 @@
     </div>
 
     <footer>
-        Created by <a href="https://md.prabath.site" target="_blank">Prabath Kumara</a>
+        Created by <a href="https://github.com/PRABATH-MD" target="_blank">Prabath Kumara</a>
     </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
         
+            lucide.createIcons();
+            
             const uploadForm = document.getElementById('upload-form');
             const fileInput = document.getElementById('file-input');
             const dropZone = document.getElementById('drop-zone-area');
@@ -334,6 +329,7 @@
             const API_ENDPOINT = `${window.location.origin}/upload`;
 
             function formatNumber(num) {
+                if (!+num) return '0';
                 if (num < 1000) return String(num);
                 if (num < 1000000) return (num / 1000).toFixed(1).replace('.0', '') + 'K';
                 if (num < 1000000000) return (num / 1000000).toFixed(1).replace('.0', '') + 'M';
@@ -371,9 +367,14 @@
             function copyToClipboard(text, statusEl) {
                 navigator.clipboard.writeText(text).then(() => {
                     statusEl.textContent = 'Copied!';
-                    setTimeout(() => { statusEl.textContent = 'Click to Copy'; }, 2000);
+                    statusEl.style.color = 'var(--accent-green)';
+                    setTimeout(() => { 
+                        statusEl.textContent = 'Click to Copy';
+                        statusEl.style.color = 'var(--text-secondary)';
+                    }, 2000);
                 }, (err) => {
                     statusEl.textContent = 'Error!';
+                    statusEl.style.color = 'var(--accent-red)';
                 });
             }
 
@@ -461,8 +462,6 @@
                 document.getElementById('api-fetch-url').textContent = `'${API_ENDPOINT}'`;
             }
 
-            lucide.createIcons();
-            
             fetchStats();
             initApiDocs();
         
