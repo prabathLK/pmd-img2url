@@ -2,97 +2,154 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale-1.0">
-    <title>pmd-utils - Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pmd-img2url - Dashboard</title>
     <style>
         :root {
-            --dark-primary: #111827; --dark-secondary: #1F2937; --dark-tertiary: #374151;
-            --border-color: #4B5563; --text-primary: #F3F4F6; --text-secondary: #9CA3AF;
-            --accent-green: #22C55E; --accent-green-hover: #16A34A; --accent-red: #EF4444;
+            --bg-black: #000000;
+            --bg-primary: #0A0A0A;
+            --bg-secondary: #111111;
+            --border-color: #222222;
+            --text-primary: #EAEAEA;
+            --text-secondary: #888888;
             --accent-blue: #3B82F6;
+            --accent-purple: #8B5CF6;
+            --accent-red: #EF4444;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--dark-primary); color: var(--text-primary);
-            display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh; padding: 2rem 1rem;
-            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-black);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 3rem 1rem;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         .container {
-            width: 100%; max-width: 700px; background: var(--dark-secondary);
-            border-radius: 16px; border: 1px solid var(--border-color);
-            padding: 2rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(34, 197, 94, 0.05);
+            width: 100%;
+            max-width: 650px;
+            background: var(--bg-primary);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 25px 50px -12px rgba(255, 255, 255, 0.03);
             margin-bottom: 2rem;
+            overflow: hidden;
         }
-        header { text-align: center; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem; }
-        header h1 { font-size: 2.25rem; font-weight: 800; }
-        header h1 span { color: var(--accent-green); }
-        header p { font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.25rem; }
+        header {
+            padding: 2rem 2rem 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+        header h1 span {
+            background-image: linear-gradient(to right, var(--accent-purple), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        header p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+        main {
+            padding: 1.5rem 2rem;
+        }
         h2 {
-            font-size: 1.25rem; font-weight: 600; color: var(--text-primary);
-            margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 1rem 0;
+            padding-bottom: 0.5rem;
         }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 1rem;
+        }
         .stat-box {
-            background: var(--dark-tertiary); padding: 1.5rem 1rem; border-radius: 12px;
-            display: flex; flex-direction: column; gap: 0.5rem; transition: all 0.3s ease;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 1.25rem;
+            border-radius: 12px;
+            transition: all 0.2s ease;
         }
-        .stat-box:hover { transform: translateY(-5px); box-shadow: 0 0 20px rgba(34, 197, 94, 0.1); }
-        .stat-box .icon { width: 24px; height: 24px; color: var(--accent-green); }
-        .stat-box h3 { font-size: 0.9rem; font-weight: 500; color: var(--text-secondary); }
-        .stat-box p { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); }
-        .storage-bar-container { background: var(--dark-primary); border-radius: 8px; overflow: hidden; height: 10px; margin-top: 0.5rem; }
-        .storage-bar-fill { background-color: var(--accent-green); height: 100%; width: 0%; transition: width 0.5s ease-out; }
-
-        .tabs { display: flex; gap: 0.5rem; margin-top: 2rem; border-bottom: 1px solid var(--border-color); }
-        .tab-button {
-            padding: 0.75rem 1rem; border: none; background: none; color: var(--text-secondary);
-            font-weight: 600; font-size: 1rem; cursor: pointer; border-radius: 8px 8px 0 0;
-            border-bottom: 3px solid transparent;
+        .stat-box h3 {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
         }
-        .tab-button.active { color: var(--accent-green); border-bottom: 3px solid var(--accent-green); }
-        .tab-content { display: none; padding-top: 1.5rem; }
-        .tab-content.active { display: block; }
-
-        input[type="text"], input[type="password"], textarea {
-            width: 100%; padding: 0.75rem; background: var(--dark-primary);
-            border: 1px solid var(--border-color); border-radius: 8px;
-            color: var(--text-primary); font-family: inherit; font-size: 1rem;
-            margin-top: 0.5rem;
+        .stat-box p {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
         }
-        textarea { resize: vertical; min-height: 150px; font-family: "SFMono-Regular", Consolas, monospace; }
-        label { font-weight: 600; font-size: 0.9rem; color: var(--text-secondary); }
-        .checkbox-wrapper { display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; }
-
+        .storage-bar-container {
+            background: var(--bg-black);
+            border-radius: 8px;
+            overflow: hidden;
+            height: 10px;
+            margin-top: 0.75rem;
+            border: 1px solid var(--border-color);
+        }
+        .storage-bar-fill {
+            background-image: linear-gradient(to right, var(--accent-blue), var(--accent-purple));
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease-out;
+        }
+        .uploader-section, .api-section { margin-top: 1.5rem; }
         .drop-zone {
-            border: 2px dashed var(--border-color); border-radius: 12px; padding: 2rem;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center; cursor: pointer; background: var(--dark-primary); transition: all 0.3s ease;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            background: var(--bg-secondary);
+            transition: all 0.3s ease;
         }
-        .drop-zone.drag-over { border-color: var(--accent-green); background: rgba(34, 197, 94, 0.1); }
-        .drop-zone .upload-icon { width: 48px; height: 48px; color: var(--accent-green); margin-bottom: 1rem; }
+        .drop-zone.drag-over {
+            border-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.05);
+        }
         .drop-zone p { font-size: 1rem; font-weight: 500; color: var(--text-primary); }
-        .drop-zone span { font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem; }
+        .drop-zone span { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem; }
         #file-input { display: none; }
         #file-name-display { font-size: 0.9rem; color: var(--text-secondary); margin-top: 1rem; text-align: center; }
         
         .upload-button {
             display: flex; align-items: center; justify-content: center;
-            width: 100%; padding: 0.8rem 1rem; margin-top: 1.5rem;
-            background: var(--accent-green); color: var(--dark-primary);
+            width: 100%; padding: 0.9rem 1rem; margin-top: 1.5rem;
+            background-image: linear-gradient(to right, var(--accent-purple), var(--accent-blue));
+            background-size: 200% auto;
+            color: white;
             border: none; border-radius: 8px; cursor: pointer;
-            font-size: 1rem; font-weight: 700; transition: all 0.3s ease;
+            font-size: 1rem; font-weight: 600;
+            transition: all 0.3s ease;
         }
-        .upload-button.blue { background: var(--accent-blue); }
-        .upload-button:hover:not(:disabled) { background: var(--accent-green-hover); transform: scale(1.02); }
-        .upload-button.blue:hover:not(:disabled) { background: #2563EB; }
-        .upload-button:disabled { background: var(--dark-tertiary); color: var(--text-secondary); cursor: not-allowed; }
-        
+        .upload-button:hover:not(:disabled) { background-position: right center; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2); }
+        .upload-button:disabled {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            background-image: none;
+        }
         .spinner {
             width: 16px; height: 16px; border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top-color: var(--dark-primary); border-radius: 50%;
+            border-top-color: white; border-radius: 50%;
             animation: spin 1s linear infinite; display: none; margin-right: 0.5rem;
         }
         .upload-button.uploading .spinner { display: block; }
@@ -100,162 +157,98 @@
         
         .message-area { margin-top: 1.5rem; text-align: center; }
         .message { padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.9rem; font-weight: 500; display: none; word-break: break-all; }
-        .message.success { background: rgba(34, 197, 94, 0.1); color: var(--accent-green); display: block; }
-        .message.error { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); display: block; }
+        .message.success { background: rgba(34, 197, 94, 0.1); color: var(--accent-green); display: block; border: 1px solid rgba(34, 197, 94, 0.5); }
+        .message.error { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); display: block; border: 1px solid rgba(239, 68, 68, 0.5); }
         .message a { color: var(--text-primary); font-weight: 700; text-decoration: underline; margin-left: 0.5rem; }
         
-        .api-section h3 { font-size: 1.1rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        .api-section h3 { font-size: 1rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; }
         .api-section p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem; }
         pre {
-            background: var(--dark-primary); border: 1px solid var(--border-color);
+            background: var(--bg-black); border: 1px solid var(--border-color);
             border-radius: 8px; padding: 1rem; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-            font-size: 0.85rem; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;
+            font-size: 0.85rem; overflow-x: auto;
         }
         code .comment { color: #6A9955; }
-        code .keyword { color: var(--accent-green); }
+        code .keyword { color: var(--accent-blue); }
         code .string { color: #CE9178; }
         code .variable { color: #9CDCFE; }
 
         footer { margin-top: 2rem; color: var(--text-secondary); font-size: 0.9rem; text-align: center; }
-        footer a { color: var(--accent-green); text-decoration: none; font-weight: 500; }
-        footer a:hover { text-decoration: underline; }
+        footer a {
+            background-image: linear-gradient(to right, var(--accent-purple), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none; font-weight: 600;
+        }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <div class="container">
         
         <header>
-            <h1><span>pmd</span>-utils</h1>
-            <p>Utility Service for PRABATH-MD by Prabath Kumara</p>
+            <h1><span>pmd</span>-img2url</h1>
+            <p>Image Service for PRABATH-MD by Prabath Kumara</p>
         </header>
         
-        <section class="stats-section">
-            <h2>Live Statistics</h2>
-            <div class="stats-grid">
-                <div class="stat-box" style="grid-column: span 2;">
-                    <h3>Storage Used (10GB)</h3>
-                    <p id="stats-storage">--</p>
-                    <div class="storage-bar-container"><div class="storage-bar-fill" id="storage-bar"></div></div>
+        <main>
+            <section class="stats-section">
+                <h2>Live Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-box" style="grid-column: span 2;">
+                        <h3>Storage Used (10GB)</h3>
+                        <p id="stats-storage">--</p>
+                        <div class="storage-bar-container"><div class="storage-bar-fill" id="storage-bar"></div></div>
+                    </div>
+                    <div class="stat-box"><h3>Available</h3><p id="stats-available">--</p></div>
+                    <div class="stat-box"><h3>Auto-Deleted</h3><p id="stats-deleted">--</p></div>
+                    <div class="stat-box"><h3>Uploads</h3><p id="stats-uploads">--</p></div>
+                    <div class="stat-box"><h3>Views</h3><p id="stats-views">--</p></div>
                 </div>
-                <div class="stat-box"><h3>Available Items</h3><p id="stats-available">--</p></div>
-                <div class="stat-box"><h3>Auto-Deleted</h3><p id="stats-deleted">--</p></div>
-                <div class="stat-box"><h3>Total Uploads</h3><p id="stats-uploads">--</p></div>
-                <div class="stat-box"><h3>Total Views</h3><p id="stats-views">--</p></div>
-            </div>
-        </section>
+            </section>
 
-        <div class="tabs">
-            <button class="tab-button active" onclick="openTab('image')">Image Host</button>
-            <button class="tab-button" onclick="openTab('paste')">Pastebin</button>
-            <button class="tab-button" onclick="openTab('tracker')">Tracker</button>
-            <button class="tab-button" onclick="openTab('api')">API</button>
-        </div>
-
-        <div id="image" class="tab-content active">
-            <h2>Upload New Image</h2>
-            <form id="upload-form">
-                <label for="file-input" class="drop-zone" id="drop-zone-area">
-                    <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l-3.75 3.75M12 9.75l3.75 3.75M3 13.5V19.5a1.5 1.5 0 0 0 1.5 1.5h15a1.5 1.5 0 0 0 1.5-1.5v-6m-1.5-6H16.5m-10.5 0h.008v.008H6v-.008ZM6 7.5H5.25A2.25 2.25 0 0 0 3 9.75v1.5a2.25 2.25 0 0 0 2.25 2.25h.75m8.25-4.5h-.008v.008H18v-.008Zm.75 4.5h.75a2.25 2.25 0 0 0 2.25-2.25v-1.5a2.25 2.25 0 0 0-2.25-2.25h-.75" /> </svg>
-                    <p>Drag & drop your file here</p>
-                    <span>or click to select (Max 2MB)</span>
-                </label>
-                <input type="file" name="file" id="file-input" accept="image/*">
-                <p id="file-name-display"></p>
-                <button type="submit" class="upload-button" id="upload-button" disabled>
-                    <span class="spinner"></span>
-                    <span class="button-text">Upload Image</span>
-                </button>
-            </form>
-            <div class="message-area" id="image-message-area"></div>
-        </div>
-        
-        <div id="paste" class="tab-content">
-            <h2>Create New Paste</h2>
-            <form id="paste-form">
-                <label for="text-content">Text Content (Max 100KB)</label>
-                <textarea id="text-content" rows="10"></textarea>
-                <div class="checkbox-wrapper">
-                    <input type="checkbox" id="encrypt-toggle" onchange="document.getElementById('password-field').style.display = this.checked ? 'block' : 'none'">
-                    <label for="encrypt-toggle">Encrypt with password?</label>
-                </div>
-                <div id="password-field" style="display: none; margin-top: 1rem;">
-                    <label for="text-password">Password (MASTER_PASSWORD)</label>
-                    <input type="password" id="text-password">
-                </div>
-                <button type="submit" class="upload-button blue" id="paste-button">
-                    <span class="spinner"></span>
-                    <span class="button-text">Create Paste</span>
-                </button>
-            </form>
-            <div class="message-area" id="paste-message-area"></div>
-        </div>
-        
-        <div id="tracker" class="tab-content">
-            <h2>Create New Tracker</h2>
-            <form id="tracker-form">
-                <label for="track-key">Tracking Key (Unique ID, e.g., 'sticker-cmd')</label>
-                <input type="text" id="track-key" required>
-                <label for="track-desc" style="margin-top: 1rem;">Description (Optional)</label>
-                <input type="text" id="track-desc">
-                <label for="track-url" style="margin-top: 1rem;">Target URL (Optional, redirect here on click)</label>
-                <input type="text" id="track-url" placeholder="https://google.com">
-                <button type="submit" class="upload-button" id="tracker-button">
-                    <span class="spinner"></span>
-                    <span class="button-text">Create Tracker</span>
-                </button>
-            </form>
-            <div class="message-area" id="tracker-message-area"></div>
+            <section class="uploader-section">
+                <h2>Upload New Image</h2>
+                <form id="upload-form">
+                    <label for="file-input" class="drop-zone" id="drop-zone-area">
+                        <p>Drag & drop your file here</p>
+                        <span>or click to select (Max 2MB)</span>
+                    </label>
+                    <input type="file" name="file" id="file-input" accept="image/*">
+                    <p id="file-name-display"></p>
+                    <button type="submit" class="upload-button" id="upload-button" disabled>
+                        <span class="spinner"></span>
+                        <span class="button-text">Upload Image</span>
+                    </button>
+                </form>
+                <div class="message-area" id="message-area"></div>
+            </section>
             
-            <h2 style="margin-top: 2rem;">All Trackers</h2>
-            <div id="tracker-list"></div>
-        </div>
+            <section class="api-section">
+                <h2>API for Developers</h2>
+                <h3>Upload a File (`POST /upload`)</h3>
+                <p>Send a `multipart/form-data` request with a field named `file` (max 2MB).</p>
+                <pre><code><span class="comment">// Example: JavaScript Fetch</span>
+<span class="keyword">const</span> <span class="variable">formData</span> = <span class="keyword">new</span> FormData();
+<span class="variable">formData</span>.append(<span class="string">'file'</span>, <span class="variable">yourFileObject</span>);
 
-        <div id="api" class="tab-content">
-            <h2>API for Developers</h2>
-            <p>Use this service programmatically. The API is designed to be simple, fast, and stable for use in your projects (like PRABATH-MD).</p>
-            <h3>Upload Image (`POST /upload`)</h3>
-            <p>Send a `multipart/form-data` request with a field named `file` (max 2MB).</p>
-            <pre><code><span class="comment">// Returns: { url: "https://.../v/key" }</span></code></pre>
-
-            <h3>Create Paste (`POST /p/upload`)</h3>
-            <p>Send a JSON request with `content` and optional `password` (MASTER_PASSWORD).</p>
-            <pre><code><span class="comment">// Example: Normal Paste</span>
-<span class="variable">fetch</span>(<span class="string">'/p/upload'</span>, {
+<span class="keyword">const</span> <span class="variable">response</span> = <span class="keyword">await</span> fetch(<span class="string">'/upload'</span>, {
   method: <span class="string">'POST'</span>,
-  headers: { <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span> },
-  body: JSON.stringify({ content: <span class="string">'Hello World'</span> })
+  body: <span class="variable">formData</span>
 });
+<span class="keyword">const</span> <span class="variable">data</span> = <span class="keyword">await</span> <span class="variable">response</span>.json();
 
-<span class="comment">// Example: Encrypted Paste</span>
-<span class="variable">fetch</span>(<span class="string">'/p/upload'</span>, {
-  method: <span class="string">'POST'</span>,
-  headers: { <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span> },
-  body: JSON.stringify({ 
-    content: <span class="string">'My Secret Password'</span>, 
-    password: <span class="string">'prabath-md-master-password'</span> 
-  })
-});
-<span class="comment">// Returns: { url: "https://.../p/key" }</span></code></pre>
-
-            <h3>Create Tracker (`POST /t/create`)</h3>
-            <p>Send a JSON request with `trackKey` (unique) and optional `description` and `targetURL`.</p>
-            <pre><code><span class="variable">fetch</span>(<span class="string">'/t/create'</span>, {
-  method: <span class="string">'POST'</span>,
-  headers: { <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span> },
-  body: JSON.stringify({ 
-    trackKey: <span class="string">'sticker-cmd-usage'</span>, 
-    description: <span class="string">'Total .sticker uses'</span>
-  })
-});
-<span class="comment">// Returns: { key, trackingURL, statsURL }</span></code></pre>
-            
-            <h3>Track Click (`GET /t/:key`)</h3>
-            <p>This is the URL to use. Accessing it increments the count and redirects (if `targetURL` was set) or returns a 1x1 pixel.</p>
-            
-            <h3>Get Tracker Stats (`GET /t/stats/:key`)</h3>
-            <p>Returns a JSON object with the tracker's data, including the `count`.</p>
-        </div>
+<span class="comment">// Success: { url: "https://.../v/key" }</span>
+<span class="comment">// Error:   { error: "File too large..." }</span>
+</code></pre>
+                
+                <h3>View / Download (`GET /v/:key`)</h3>
+                <p>Access the `url` from the success response. This logs the access (for the 30-day auto-delete) and redirects to the high-speed R2 file.</p>
+            </section>
+        </main>
 
     </div>
 
@@ -264,6 +257,13 @@
     </footer>
 
     <script>
+        const uploadForm = document.getElementById('upload-form');
+        const fileInput = document.getElementById('file-input');
+        const dropZone = document.getElementById('drop-zone-area');
+        const uploadButton = document.getElementById('upload-button');
+        const fileNameDisplay = document.getElementById('file-name-display');
+        const messageArea = document.getElementById('message-area');
+        
         const FILE_SIZE_LIMIT = 2 * 1024 * 1024;
         const STORAGE_LIMIT_BYTES = 10 * 1024 * 1024 * 1024;
 
@@ -281,6 +281,7 @@
                 const response = await fetch('/stats');
                 if (!response.ok) throw new Error('Stats API failed');
                 const data = await response.json();
+                
                 const storagePercent = (data.currentStorage / STORAGE_LIMIT_BYTES) * 100;
                 
                 document.getElementById('stats-storage').innerText = `${formatBytes(data.currentStorage)} / 10 GB`;
@@ -291,67 +292,30 @@
                 document.getElementById('stats-deleted').innerText = data.totalDeletes;
                 document.getElementById('stats-uploads').innerText = data.totalUploads;
                 document.getElementById('stats-views').innerText = data.totalViews;
-            } catch (err) {
-                console.error('Failed to fetch stats:', err);
-            }
-        }
-        
-        async function fetchTrackers() {
-            try {
-                const response = await fetch('/t/stats/all');
-                const trackers = await response.json();
-                const listEl = document.getElementById('tracker-list');
-                listEl.innerHTML = '';
-                if(trackers.length === 0) {
-                    listEl.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">No trackers created yet.</p>';
-                    return;
-                }
-                trackers.forEach(t => {
-                    const el = document.createElement('div');
-                    el.style = 'background: var(--dark-tertiary); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;';
-                    el.innerHTML = `
-                        <h4 style="color: var(--accent-green);">${t.trackKey}</h4>
-                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Count: <strong style="color: var(--text-primary);">${t.count}</strong></p>
-                        <p style="color: var(--text-secondary); font-size: 0.9rem; word-break: break-all;">URL: ${window.location.origin}/t/${t.trackKey}</p>
-                    `;
-                    listEl.appendChild(el);
-                });
-            } catch (err) {
-                 console.error('Failed to fetch trackers:', err);
-            }
+            } catch (err) { console.error('Failed to fetch stats:', err); }
         }
 
-        function showMessage(areaId, type, text, url = null) {
-            const area = document.getElementById(areaId);
-            area.innerHTML = '';
-            const el = document.createElement('div');
-            el.className = `message ${type}`;
-            el.innerHTML = text + (url ? ` <a href="${url}" target="_blank">View URL</a>` : '');
-            area.appendChild(el);
+        function showMessage(type, text, url = null) {
+            messageArea.innerHTML = '';
+            const messageEl = document.createElement('div');
+            messageEl.className = `message ${type}`;
+            let content = text;
+            if (url) { content += ` <a href="${url}" target="_blank">View URL</a>`; }
+            messageEl.innerHTML = content;
+            messageArea.appendChild(messageEl);
         }
         
-        function clearMessage(areaId) { document.getElementById(areaId).innerHTML = ''; }
-        
-        function openTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-            document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`).classList.add('active');
-            if (tabName === 'tracker') fetchTrackers();
-        }
-
-        // --- Image Upload Logic ---
-        const uploadForm = document.getElementById('upload-form');
-        const fileInput = document.getElementById('file-input');
-        const dropZone = document.getElementById('drop-zone-area');
-        const uploadButton = document.getElementById('upload-button');
-        const fileNameDisplay = document.getElementById('file-name-display');
+        function clearMessage() { messageArea.innerHTML = ''; }
 
         function handleFile(file) {
-            clearMessage('image-message-area');
-            if (!file) { fileNameDisplay.textContent = ''; uploadButton.disabled = true; return; }
+            clearMessage();
+            if (!file) {
+                fileNameDisplay.textContent = '';
+                uploadButton.disabled = true;
+                return;
+            }
             if (file.size > FILE_SIZE_LIMIT) {
-                showMessage('image-message-area', 'error', 'File is too large. Limit is 2MB.');
+                showMessage('error', 'File is too large. Limit is 2MB.');
                 fileNameDisplay.textContent = file.name;
                 uploadButton.disabled = true;
                 return;
@@ -360,131 +324,48 @@
             uploadButton.disabled = false;
         }
 
-        // --- මෙන්න නිවැරදි කිරීම ---
-        // dropZone.addEventListener('click', () => fileInput.click()); // <-- BUG එක තිබ්බ line එක අයින් කළා
-        
         ['dragover', 'dragenter'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('drag-over'); }));
         ['dragleave', 'dragend', 'drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('drag-over'); }));
+        
         dropZone.addEventListener('drop', e => {
             fileInput.files = e.dataTransfer.files;
             handleFile(e.dataTransfer.files[0]);
         });
+        
         fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
 
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            clearMessage('image-message-area');
+            clearMessage();
             const file = fileInput.files[0];
             if (!file) return;
+
             uploadButton.disabled = true;
             uploadButton.classList.add('uploading');
             uploadButton.querySelector('.button-text').textContent = 'Uploading...';
+            
             const formData = new FormData();
             formData.append('file', file);
+            
             try {
-                const res = await fetch('/upload', { method: 'POST', body: formData });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Upload failed');
-                showMessage('image-message-area', 'success', 'Upload Successful!', data.url);
+                const response = await fetch('/upload', { method: 'POST', body: formData });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Upload failed');
+                
+                showMessage('success', 'Upload Successful!', data.url);
                 fetchStats();
                 uploadForm.reset();
                 fileNameDisplay.textContent = '';
+                
             } catch (err) {
-                showMessage('image-message-area', 'error', err.message.replace('507', '') || 'An unknown error occurred.');
+                showMessage('error', err.message.replace('507', '') || 'An unknown error occurred.');
             } finally {
                 uploadButton.disabled = false;
                 uploadButton.classList.remove('uploading');
                 uploadButton.querySelector('.button-text').textContent = 'Upload Image';
             }
         });
-        
-        // --- Pastebin Logic ---
-        const pasteForm = document.getElementById('paste-form');
-        const pasteButton = document.getElementById('paste-button');
-        
-        pasteForm.addEventListener('submit', async (e) => {
-             e.preventDefault();
-             clearMessage('paste-message-area');
-             const content = document.getElementById('text-content').value;
-             const isEncrypted = document.getElementById('encrypt-toggle').checked;
-             const password = document.getElementById('text-password').value;
-             
-             if (!content) {
-                 showMessage('paste-message-area', 'error', 'Text content cannot be empty.');
-                 return;
-             }
-             
-             let body = { content };
-             if (isEncrypted) {
-                 if (!password) {
-                     showMessage('paste-message-area', 'error', 'Password is required for encryption.');
-                     return;
-                 }
-                 body.password = password;
-             }
-             
-             pasteButton.disabled = true;
-             pasteButton.classList.add('uploading');
-             
-             try {
-                const res = await fetch('/p/upload', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Failed to create paste.');
-                showMessage('paste-message-area', 'success', 'Paste created!', data.url);
-                fetchStats();
-                pasteForm.reset();
-                document.getElementById('password-field').style.display = 'none';
-             } catch(err) {
-                 showMessage('paste-message-area', 'error', err.message);
-             } finally {
-                 pasteButton.disabled = false;
-                 pasteButton.classList.remove('uploading');
-             }
-        });
-        
-        // --- Tracker Logic ---
-        const trackerForm = document.getElementById('tracker-form');
-        const trackerButton = document.getElementById('tracker-button');
-        
-        trackerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            clearMessage('tracker-message-area');
-            const key = document.getElementById('track-key').value;
-            const desc = document.getElementById('track-desc').value;
-            const url = document.getElementById('track-url').value;
-            
-            if (!key) {
-                showMessage('tracker-message-area', 'error', 'Tracking Key is required.');
-                return;
-            }
-            
-            trackerButton.disabled = true;
-            trackerButton.classList.add('uploading');
-            
-            try {
-                const res = await fetch('/t/create', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ trackKey: key, description: desc, targetURL: url })
-                });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Failed to create tracker.');
-                showMessage('tracker-message-area', 'success', `Tracker created! URL: ${data.trackingURL}`);
-                fetchTrackers();
-                trackerForm.reset();
-            } catch(err) {
-                showMessage('tracker-message-area', 'error', err.message);
-            } finally {
-                trackerButton.disabled = false;
-                trackerButton.classList.remove('uploading');
-            }
-        });
 
-        // --- Initial Load ---
         fetchStats();
     </script>
 </body>
