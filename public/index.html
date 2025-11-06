@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pmd-img2url - Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale-1.0">
+    <title>pmd-utils - Dashboard</title>
     <style>
         :root {
             --dark-primary: #111827; --dark-secondary: #1F2937; --dark-tertiary: #374151;
             --border-color: #4B5563; --text-primary: #F3F4F6; --text-secondary: #9CA3AF;
             --accent-green: #22C55E; --accent-green-hover: #16A34A; --accent-red: #EF4444;
+            --accent-blue: #3B82F6;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -42,24 +43,29 @@
         .stat-box .icon { width: 24px; height: 24px; color: var(--accent-green); }
         .stat-box h3 { font-size: 0.9rem; font-weight: 500; color: var(--text-secondary); }
         .stat-box p { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); }
-        
-        /* Storage Bar */
-        .storage-bar-container {
-            background: var(--dark-primary);
-            border-radius: 8px;
-            overflow: hidden;
-            height: 10px;
+        .storage-bar-container { background: var(--dark-primary); border-radius: 8px; overflow: hidden; height: 10px; margin-top: 0.5rem; }
+        .storage-bar-fill { background-color: var(--accent-green); height: 100%; width: 0%; transition: width 0.5s ease-out; }
+
+        .tabs { display: flex; gap: 0.5rem; margin-top: 2rem; border-bottom: 1px solid var(--border-color); }
+        .tab-button {
+            padding: 0.75rem 1rem; border: none; background: none; color: var(--text-secondary);
+            font-weight: 600; font-size: 1rem; cursor: pointer; border-radius: 8px 8px 0 0;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-button.active { color: var(--accent-green); border-bottom: 3px solid var(--accent-green); }
+        .tab-content { display: none; padding-top: 1.5rem; }
+        .tab-content.active { display: block; }
+
+        input[type="text"], input[type="password"], textarea {
+            width: 100%; padding: 0.75rem; background: var(--dark-primary);
+            border: 1px solid var(--border-color); border-radius: 8px;
+            color: var(--text-primary); font-family: inherit; font-size: 1rem;
             margin-top: 0.5rem;
         }
-        .storage-bar-fill {
-            background-color: var(--accent-green);
-            height: 100%;
-            width: 0%;
-            transition: width 0.5s ease-out;
-        }
+        textarea { resize: vertical; min-height: 150px; font-family: "SFMono-Regular", Consolas, monospace; }
+        label { font-weight: 600; font-size: 0.9rem; color: var(--text-secondary); }
+        .checkbox-wrapper { display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; }
 
-        .uploader-section, .api-section { margin-top: 2rem; }
-        
         .drop-zone {
             border: 2px dashed var(--border-color); border-radius: 12px; padding: 2rem;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -79,7 +85,9 @@
             border: none; border-radius: 8px; cursor: pointer;
             font-size: 1rem; font-weight: 700; transition: all 0.3s ease;
         }
+        .upload-button.blue { background: var(--accent-blue); }
         .upload-button:hover:not(:disabled) { background: var(--accent-green-hover); transform: scale(1.02); }
+        .upload-button.blue:hover:not(:disabled) { background: #2563EB; }
         .upload-button:disabled { background: var(--dark-tertiary); color: var(--text-secondary); cursor: not-allowed; }
         
         .spinner {
@@ -118,45 +126,33 @@
     <div class="container">
         
         <header>
-            <h1><span>pmd</span>-img2url</h1>
-            <p>Image service for PRABATH-MD by Prabath Kumara</p>
+            <h1><span>pmd</span>-utils</h1>
+            <p>Utility Service for PRABATH-MD by Prabath Kumara</p>
         </header>
         
         <section class="stats-section">
             <h2>Live Statistics</h2>
             <div class="stats-grid">
-                
-                <div class="stat-box">
+                <div class="stat-box" style="grid-column: span 2;">
                     <h3>Storage Used (10GB)</h3>
                     <p id="stats-storage">--</p>
-                    <div class="storage-bar-container">
-                        <div class="storage-bar-fill" id="storage-bar"></div>
-                    </div>
+                    <div class="storage-bar-container"><div class="storage-bar-fill" id="storage-bar"></div></div>
                 </div>
-
-                <div class="stat-box">
-                    <h3>Available Images</h3>
-                    <p id="stats-available">--</p>
-                </div>
-
-                <div class="stat-box">
-                    <h3>Auto-Deleted</h3>
-                    <p id="stats-deleted">--</p>
-                </div>
-
-                <div class="stat-box">
-                    <h3>Total Uploads</h3>
-                    <p id="stats-uploads">--</p>
-                </div>
-                
-                <div class="stat-box" style="grid-column: span 2;">
-                    <h3>Total Views</h3>
-                    <p id="stats-views">--</p>
-                </div>
+                <div class="stat-box"><h3>Available Items</h3><p id="stats-available">--</p></div>
+                <div class="stat-box"><h3>Auto-Deleted</h3><p id="stats-deleted">--</p></div>
+                <div class="stat-box"><h3>Total Uploads</h3><p id="stats-uploads">--</p></div>
+                <div class="stat-box"><h3>Total Views</h3><p id="stats-views">--</p></div>
             </div>
         </section>
 
-        <section class="uploader-section">
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab('image')">Image Host</button>
+            <button class="tab-button" onclick="openTab('paste')">Pastebin</button>
+            <button class="tab-button" onclick="openTab('tracker')">Tracker</button>
+            <button class="tab-button" onclick="openTab('api')">API</button>
+        </div>
+
+        <div id="image" class="tab-content active">
             <h2>Upload New Image</h2>
             <form id="upload-form">
                 <label for="file-input" class="drop-zone" id="drop-zone-area">
@@ -168,57 +164,98 @@
                 <p id="file-name-display"></p>
                 <button type="submit" class="upload-button" id="upload-button" disabled>
                     <span class="spinner"></span>
-                    <span class="button-text">Upload</span>
+                    <span class="button-text">Upload Image</span>
                 </button>
             </form>
-            <div class="message-area" id="message-area"></div>
-        </section>
+            <div class="message-area" id="image-message-area"></div>
+        </div>
         
-        <section class="api-section">
+        <div id="paste" class="tab-content">
+            <h2>Create New Paste</h2>
+            <form id="paste-form">
+                <label for="text-content">Text Content (Max 100KB)</label>
+                <textarea id="text-content" rows="10"></textarea>
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="encrypt-toggle" onchange="document.getElementById('password-field').style.display = this.checked ? 'block' : 'none'">
+                    <label for="encrypt-toggle">Encrypt with password?</label>
+                </div>
+                <div id="password-field" style="display: none; margin-top: 1rem;">
+                    <label for="text-password">Password (MASTER_PASSWORD)</label>
+                    <input type="password" id="text-password">
+                </div>
+                <button type="submit" class="upload-button blue" id="paste-button">
+                    <span class="spinner"></span>
+                    <span class="button-text">Create Paste</span>
+                </button>
+            </form>
+            <div class="message-area" id="paste-message-area"></div>
+        </div>
+        
+        <div id="tracker" class="tab-content">
+            <h2>Create New Tracker</h2>
+            <form id="tracker-form">
+                <label for="track-key">Tracking Key (Unique ID, e.g., 'sticker-cmd')</label>
+                <input type="text" id="track-key" required>
+                <label for="track-desc" style="margin-top: 1rem;">Description (Optional)</label>
+                <input type="text" id="track-desc">
+                <label for="track-url" style="margin-top: 1rem;">Target URL (Optional, redirect here on click)</label>
+                <input type="text" id="track-url" placeholder="https://google.com">
+                <button type="submit" class="upload-button" id="tracker-button">
+                    <span class="spinner"></span>
+                    <span class="button-text">Create Tracker</span>
+                </button>
+            </form>
+            <div class="message-area" id="tracker-message-area"></div>
+            
+            <h2 style="margin-top: 2rem;">All Trackers</h2>
+            <div id="tracker-list"></div>
+        </div>
+
+        <div id="api" class="tab-content">
             <h2>API for Developers</h2>
             <p>Use this service programmatically. The API is designed to be simple, fast, and stable for use in your projects (like PRABATH-MD).</p>
+            <h3>Upload Image (`POST /upload`)</h3>
+            <p>Send a `multipart/form-data` request with a field named `file` (max 2MB).</p>
+            <pre><code><span class="comment">// Returns: { url: "https://.../v/key" }</span></code></pre>
 
-            <h3>Upload a File (`POST /upload`)</h3>
-            <p>Send a `multipart/form-data` request with a field named `file` containing your image data (max 2MB).</p>
-            <pre><code><span class="comment">// Example using fetch (JavaScript)</span>
-<span class="keyword">const</span> <span class="variable">fileInput</span> = document.querySelector('input[type="file"]');
-<span class="keyword">const</span> <span class="variable">formData</span> = <span class="keyword">new</span> FormData();
-<span class="variable">formData</span>.append(<span class="string">'file'</span>, <span class="variable">fileInput</span>.files[0]);
+            <h3>Create Paste (`POST /p/upload`)</h3>
+            <p>Send a JSON request with `content` and optional `password` (MASTER_PASSWORD).</p>
+            <pre><code><span class="comment">// Example: Normal Paste</span>
+<span class="variable">fetch</span>(<span class="string">'/p/upload'</span>, {
+  method: <span class="string">'POST'</span>,
+  headers: { <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span> },
+  body: JSON.stringify({ content: <span class="string">'Hello World'</span> })
+});
 
-<span class="keyword">try</span> {
-  <span class="keyword">const</span> <span class="variable">response</span> = <span class="keyword">await</span> fetch(<span class="string">'https://pmd-img2url.koyeb.app/upload'</span>, {
-    method: <span class="string">'POST'</span>,
-    body: <span class="variable">formData</span>
-  });
-  
-  <span class="keyword">const</span> <span class="variable">data</span> = <span class="keyword">await</span> <span class="variable">response</span>.json();
-  
-  <span class="keyword">if</span> (!<span class="variable">response</span>.ok) {
-    <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="variable">data</span>.error);
-  }
+<span class="comment">// Example: Encrypted Paste</span>
+<span class="variable">fetch</span>(<span class="string">'/p/upload'</span>, {
+  method: <span class="string">'POST'</span>,
+  headers: { <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span> },
+  body: JSON.stringify({ 
+    content: <span class="string">'My Secret Password'</span>, 
+    password: <span class="string">'prabath-md-master-password'</span> 
+  })
+});
+<span class="comment">// Returns: { url: "https://.../p/key" }</span></code></pre>
 
-  console.log(<span class="string">'Success:'</span>, <span class="variable">data</span>.url);
-  
-} <span class="keyword">catch</span> (error) {
-  console.error(<span class="string">'Error:'</span>, error.message);
-}</code></pre>
-
-            <h3>Success Response (Download/View URL)</h3>
-            <p>A successful upload will return a `200 OK` status and a JSON object containing the "smart" URL. This is the URL you must use, as it tracks accesses for the auto-delete script.</p>
-            <pre><code>{
-  <span class="string">"url"</span>: <span class="string">"https://pmd-img2url.koyeb.app/v/a1b2c3d4e5f6.jpg"</span>
-}</code></pre>
+            <h3>Create Tracker (`POST /t/create`)</h3>
+            <p>Send a JSON request with `trackKey` (unique) and optional `description` and `targetURL`.</p>
+            <pre><code><span class="variable">fetch</span>(<span class="string">'/t/create'</span>, {
+  method: <span class="string">'POST'</span>,
+  headers: { <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span> },
+  body: JSON.stringify({ 
+    trackKey: <span class="string">'sticker-cmd-usage'</span>, 
+    description: <span class="string">'Total .sticker uses'</span>
+  })
+});
+<span class="comment">// Returns: { key, trackingURL, statsURL }</span></code></pre>
             
-            <h3>View / Download (`GET /v/:key`)</h3>
-            <p>When you access the `url` provided, the server will log the access (resetting the 30-day delete timer) and then instantly redirect you to the high-speed, cached Cloudflare R2 file.</p>
+            <h3>Track Click (`GET /t/:key`)</h3>
+            <p>This is the URL to use. Accessing it increments the count and redirects (if `targetURL` was set) or returns a 1x1 pixel.</p>
             
-            <h3>Error Response (e.g., 10GB Limit Reached)</h3>
-            <p>If the upload is blocked (e.g., storage full), you will get a non-200 status and a JSON error.</p>
-            <pre><code>{
-  <span class="string">"error"</span>: <span class="string">"Storage limit exceeded (10GB). Cannot upload new files..."</span>
-}</code></pre>
-
-        </section>
+            <h3>Get Tracker Stats (`GET /t/stats/:key`)</h3>
+            <p>Returns a JSON object with the tracker's data, including the `count`.</p>
+        </div>
 
     </div>
 
@@ -227,15 +264,8 @@
     </footer>
 
     <script>
-        const uploadForm = document.getElementById('upload-form');
-        const fileInput = document.getElementById('file-input');
-        const dropZone = document.getElementById('drop-zone-area');
-        const uploadButton = document.getElementById('upload-button');
-        const fileNameDisplay = document.getElementById('file-name-display');
-        const messageArea = document.getElementById('message-area');
-        
-        const FILE_SIZE_LIMIT = 2 * 1024 * 1024; // 2MB
-        const STORAGE_LIMIT_BYTES = 10 * 1024 * 1024 * 1024; // 10GB
+        const FILE_SIZE_LIMIT = 2 * 1024 * 1024;
+        const STORAGE_LIMIT_BYTES = 10 * 1024 * 1024 * 1024;
 
         function formatBytes(bytes, decimals = 2) {
             if (bytes === 0) return '0 Bytes';
@@ -251,7 +281,6 @@
                 const response = await fetch('/stats');
                 if (!response.ok) throw new Error('Stats API failed');
                 const data = await response.json();
-                
                 const storagePercent = (data.currentStorage / STORAGE_LIMIT_BYTES) * 100;
                 
                 document.getElementById('stats-storage').innerText = `${formatBytes(data.currentStorage)} / 10 GB`;
@@ -266,38 +295,63 @@
                 console.error('Failed to fetch stats:', err);
             }
         }
+        
+        async function fetchTrackers() {
+            try {
+                const response = await fetch('/t/stats/all');
+                const trackers = await response.json();
+                const listEl = document.getElementById('tracker-list');
+                listEl.innerHTML = '';
+                if(trackers.length === 0) {
+                    listEl.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">No trackers created yet.</p>';
+                    return;
+                }
+                trackers.forEach(t => {
+                    const el = document.createElement('div');
+                    el.style = 'background: var(--dark-tertiary); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;';
+                    el.innerHTML = `
+                        <h4 style="color: var(--accent-green);">${t.trackKey}</h4>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Count: <strong style="color: var(--text-primary);">${t.count}</strong></p>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; word-break: break-all;">URL: ${window.location.origin}/t/${t.trackKey}</p>
+                    `;
+                    listEl.appendChild(el);
+                });
+            } catch (err) {
+                 console.error('Failed to fetch trackers:', err);
+            }
+        }
 
-        function showMessage(type, text, url = null) {
-            messageArea.innerHTML = '';
-            const messageEl = document.createElement('div');
-            messageEl.className = `message ${type}`;
-            let content = text;
-            if (url) {
-                content += ` <a href="${url}" target="_blank">View URL</a>`;
-            }
-            messageEl.innerHTML = content;
-            messageArea.appendChild(messageEl);
+        function showMessage(areaId, type, text, url = null) {
+            const area = document.getElementById(areaId);
+            area.innerHTML = '';
+            const el = document.createElement('div');
+            el.className = `message ${type}`;
+            el.innerHTML = text + (url ? ` <a href="${url}" target="_blank">View URL</a>` : '');
+            area.appendChild(el);
         }
         
-        function clearMessage() { messageArea.innerHTML = ''; }
+        function clearMessage(areaId) { document.getElementById(areaId).innerHTML = ''; }
         
-        function handlePageLoadMessage() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('success') && urlParams.has('url')) {
-                showMessage('success', 'Upload Successful!', urlParams.get('url'));
-                history.replaceState(null, '', window.location.pathname);
-            }
+        function openTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`).classList.add('active');
+            if (tabName === 'tracker') fetchTrackers();
         }
+
+        // --- Image Upload Logic ---
+        const uploadForm = document.getElementById('upload-form');
+        const fileInput = document.getElementById('file-input');
+        const dropZone = document.getElementById('drop-zone-area');
+        const uploadButton = document.getElementById('upload-button');
+        const fileNameDisplay = document.getElementById('file-name-display');
 
         function handleFile(file) {
-            clearMessage();
-            if (!file) {
-                fileNameDisplay.textContent = '';
-                uploadButton.disabled = true;
-                return;
-            }
+            clearMessage('image-message-area');
+            if (!file) { fileNameDisplay.textContent = ''; uploadButton.disabled = true; return; }
             if (file.size > FILE_SIZE_LIMIT) {
-                showMessage('error', 'File is too large. Limit is 2MB.');
+                showMessage('image-message-area', 'error', 'File is too large. Limit is 2MB.');
                 fileNameDisplay.textContent = file.name;
                 uploadButton.disabled = true;
                 return;
@@ -306,64 +360,132 @@
             uploadButton.disabled = false;
         }
 
-        dropZone.addEventListener('click', () => fileInput.click());
-        ['dragover', 'dragenter'].forEach(eventName => {
-            dropZone.addEventListener(eventName, e => {
-                e.preventDefault();
-                dropZone.classList.add('drag-over');
-            });
-        });
-        ['dragleave', 'dragend', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, e => {
-                e.preventDefault();
-                dropZone.classList.remove('drag-over');
-            });
-        });
+        // --- මෙන්න නිවැරදි කිරීම ---
+        // dropZone.addEventListener('click', () => fileInput.click()); // <-- BUG එක තිබ්බ line එක අයින් කළා
+        
+        ['dragover', 'dragenter'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('drag-over'); }));
+        ['dragleave', 'dragend', 'drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('drag-over'); }));
         dropZone.addEventListener('drop', e => {
-            const file = e.dataTransfer.files[0];
             fileInput.files = e.dataTransfer.files;
-            handleFile(file);
+            handleFile(e.dataTransfer.files[0]);
         });
-        fileInput.addEventListener('change', () => {
-            const file = fileInput.files[0];
-            handleFile(file);
-        });
+        fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
 
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            clearMessage();
+            clearMessage('image-message-area');
             const file = fileInput.files[0];
-            if (!file || file.size > FILE_SIZE_LIMIT) {
-                showMessage('error', 'Cannot upload. File is invalid or too large.');
-                return;
-            }
+            if (!file) return;
             uploadButton.disabled = true;
             uploadButton.classList.add('uploading');
             uploadButton.querySelector('.button-text').textContent = 'Uploading...';
             const formData = new FormData();
             formData.append('file', file);
             try {
-                const response = await fetch('/upload', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.error || 'Upload failed');
-                showMessage('success', 'Upload Successful!', data.url);
+                const res = await fetch('/upload', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Upload failed');
+                showMessage('image-message-area', 'success', 'Upload Successful!', data.url);
                 fetchStats();
                 uploadForm.reset();
                 fileNameDisplay.textContent = '';
             } catch (err) {
-                showMessage('error', err.message.replace('507', '') || 'An unknown error occurred.');
+                showMessage('image-message-area', 'error', err.message.replace('507', '') || 'An unknown error occurred.');
             } finally {
                 uploadButton.disabled = false;
                 uploadButton.classList.remove('uploading');
-                uploadButton.querySelector('.button-text').textContent = 'Upload';
+                uploadButton.querySelector('.button-text').textContent = 'Upload Image';
+            }
+        });
+        
+        // --- Pastebin Logic ---
+        const pasteForm = document.getElementById('paste-form');
+        const pasteButton = document.getElementById('paste-button');
+        
+        pasteForm.addEventListener('submit', async (e) => {
+             e.preventDefault();
+             clearMessage('paste-message-area');
+             const content = document.getElementById('text-content').value;
+             const isEncrypted = document.getElementById('encrypt-toggle').checked;
+             const password = document.getElementById('text-password').value;
+             
+             if (!content) {
+                 showMessage('paste-message-area', 'error', 'Text content cannot be empty.');
+                 return;
+             }
+             
+             let body = { content };
+             if (isEncrypted) {
+                 if (!password) {
+                     showMessage('paste-message-area', 'error', 'Password is required for encryption.');
+                     return;
+                 }
+                 body.password = password;
+             }
+             
+             pasteButton.disabled = true;
+             pasteButton.classList.add('uploading');
+             
+             try {
+                const res = await fetch('/p/upload', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Failed to create paste.');
+                showMessage('paste-message-area', 'success', 'Paste created!', data.url);
+                fetchStats();
+                pasteForm.reset();
+                document.getElementById('password-field').style.display = 'none';
+             } catch(err) {
+                 showMessage('paste-message-area', 'error', err.message);
+             } finally {
+                 pasteButton.disabled = false;
+                 pasteButton.classList.remove('uploading');
+             }
+        });
+        
+        // --- Tracker Logic ---
+        const trackerForm = document.getElementById('tracker-form');
+        const trackerButton = document.getElementById('tracker-button');
+        
+        trackerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearMessage('tracker-message-area');
+            const key = document.getElementById('track-key').value;
+            const desc = document.getElementById('track-desc').value;
+            const url = document.getElementById('track-url').value;
+            
+            if (!key) {
+                showMessage('tracker-message-area', 'error', 'Tracking Key is required.');
+                return;
+            }
+            
+            trackerButton.disabled = true;
+            trackerButton.classList.add('uploading');
+            
+            try {
+                const res = await fetch('/t/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ trackKey: key, description: desc, targetURL: url })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Failed to create tracker.');
+                showMessage('tracker-message-area', 'success', `Tracker created! URL: ${data.trackingURL}`);
+                fetchTrackers();
+                trackerForm.reset();
+            } catch(err) {
+                showMessage('tracker-message-area', 'error', err.message);
+            } finally {
+                trackerButton.disabled = false;
+                trackerButton.classList.remove('uploading');
             }
         });
 
+        // --- Initial Load ---
         fetchStats();
-        handlePageLoadMessage();
     </script>
 </body>
 </html>
