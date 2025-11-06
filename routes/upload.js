@@ -9,11 +9,14 @@ import { getStats } from '../models/Stats.js';
 
 const router = express.Router();
 
+const STORAGE_LIMIT_BYTES = 10 * 1024 * 1024 * 1024; // 10 GB
+const FILE_LIMIT_BYTES = 2 * 1024 * 1024; // 2 MB
+
 const storage = multer.memoryStorage();
 const upload = multer({
   storage: storage,
   limits: { 
-    fileSize: 2 * 1024 * 1024
+    fileSize: FILE_LIMIT_BYTES
   }, 
 }).single('file');
 
@@ -24,12 +27,24 @@ router.post('/', (req, res) => {
     } else if (err) {
       return res.status(500).json({ error: err.message });
     }
-
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded.' });
     }
 
     try {
+      const newFileSize = req.file.buffer.length;
+
+      const agg = await Image.aggregate([
+        { $group: { _id: null, totalStorage: { $sum: "$fileSize" } } }
+      ]);
+      const currentStorage = agg[0]?.totalStorage || 0;
+
+      if (currentStorage + newFileSize > STORAGE_LIMIT_BYTES) {
+        return res.status(507).json({ 
+          error: 'Storage limit exceeded (10GB). Cannot upload new files until space is freed.' 
+        });
+      }
+
       const fileExt = path.extname(req.file.originalname);
       const fileKey = crypto.randomBytes(16).toString('hex') + fileExt;
 
@@ -44,6 +59,7 @@ router.post('/', (req, res) => {
       const newImage = new Image({
         fileKey: fileKey,
         originalName: req.file.originalname,
+        fileSize: newFileSize,
         lastAccessedDate: Date.now(),
       });
       await newImage.save();
