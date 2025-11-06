@@ -1,5 +1,6 @@
 import express from 'express';
 import Image from '../models/Image.js';
+import { BUCKET_NAME } from '../config/s3Client.js';
 
 const router = express.Router();
 
@@ -16,7 +17,7 @@ router.get('/:key', async (req, res) => {
     image.lastAccessedDate = Date.now();
     await image.save();
 
-    const r2Url = `${process.env.R2_PUBLIC_URL}/${image.fileKey}`;
+        const r2Url = `${process.env.R2_PUBLIC_URL}/${BUCKET_NAME}/${image.fileKey}`;
 
     res.redirect(302, r2Url);
 
