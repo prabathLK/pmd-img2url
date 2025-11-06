@@ -5,115 +5,519 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>pmd-img2url - Dashboard</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 90vh; background: #1a1a1a; color: #eee; padding-top: 2rem; }
-        .container { background: #2c2c2c; width: 90%; max-width: 600px; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); margin-bottom: 2rem; }
-        h1 { text-align: center; color: #00aaff; margin-top: 0; }
-        h2 { border-bottom: 1px solid #444; padding-bottom: 10px; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        .stat-box { background: #333; padding: 1.5rem; border-radius: 8px; text-align: center; }
-        .stat-box h3 { margin: 0 0 10px 0; color: #00aaff; }
-        .stat-box p { font-size: 2rem; font-weight: bold; margin: 0; color: #fff; }
-        .uploader-box { margin-top: 1.5rem; }
-        input[type="file"] { display: block; width: 100%; padding: 10px; margin-top: 1rem; color: #ccc; background: #444; border: 1px dashed #666; border-radius: 4px; box-sizing: border-box; }
-        button { display: block; width: 100%; padding: 0.8rem; margin-top: 1.5rem; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; font-weight: bold; }
-        button:hover { background: #0056b3; }
-        .message { padding: 1rem; border-radius: 4px; margin-top: 1rem; text-align: center; }
-        .message.success { background: #28a745; color: white; }
-        .message.error { background: #dc3545; color: white; }
-        .message a { color: white; font-weight: bold; text-decoration: underline; }
-        footer { margin-top: auto; padding-bottom: 1rem; color: #777; font-size: 0.9rem; }
+        /* --- Base & Typography --- */
+        :root {
+            --dark-primary: #111827;  /* Main Background */
+            --dark-secondary: #1F2937; /* Card Background */
+            --dark-tertiary: #374151; /* Stat Box Background */
+            --border-color: #4B5563;
+            --text-primary: #F3F4F6;
+            --text-secondary: #9CA3AF;
+            --accent-green: #22C55E; /* Premium Green */
+            --accent-green-hover: #16A34A;
+            --accent-red: #EF4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--dark-primary);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* --- Main Container --- */
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background: var(--dark-secondary);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(34, 197, 94, 0.05);
+        }
+
+        /* --- Header --- */
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1.5rem;
+        }
+
+        header h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+        }
+
+        header h1 span {
+            color: var(--accent-green);
+        }
+
+        header p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* --- Stats Grid --- */
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-box {
+            background: var(--dark-tertiary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-box:hover {
+             transform: translateY(-5px);
+             box-shadow: 0 0 20px rgba(34, 197, 94, 0.1);
+        }
+
+        .stat-box .icon {
+            width: 24px;
+            height: 24px;
+            color: var(--accent-green);
+        }
+
+        .stat-box h3 {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .stat-box p {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* --- Uploader --- */
+        .uploader-section {
+            margin-top: 2rem;
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            background: var(--dark-primary);
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone.drag-over {
+            border-color: var(--accent-green);
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .drop-zone .upload-icon {
+            width: 48px;
+            height: 48px;
+            color: var(--accent-green);
+            margin-bottom: 1rem;
+        }
+
+        .drop-zone p {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .drop-zone span {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        #file-name-display {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        /* --- Button & Spinner --- */
+        .upload-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0.8rem 1rem;
+            margin-top: 1.5rem;
+            background: var(--accent-green);
+            color: var(--dark-primary);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .upload-button:hover:not(:disabled) {
+            background: var(--accent-green-hover);
+            transform: scale(1.02);
+        }
+
+        .upload-button:disabled {
+            background: var(--dark-tertiary);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: var(--dark-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+            margin-right: 0.5rem;
+        }
+        
+        .upload-button.uploading .spinner {
+            display: block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- Messages --- */
+        .message-area {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+        
+        .message {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: none;
+            word-break: break-all;
+        }
+        
+        .message.success {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--accent-green);
+            display: block;
+        }
+        
+        .message.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+            display: block;
+        }
+        
+        .message a {
+            color: var(--text-primary);
+            font-weight: 700;
+            text-decoration: underline;
+            margin-left: 0.5rem;
+        }
+
+        /* --- Footer --- */
+        footer {
+            margin-top: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        footer a {
+            color: var(--accent-green);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 600px) {
+            body { padding: 1rem 0.5rem; }
+            .container { padding: 1.5rem; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .stat-box { padding: 1rem; }
+            .stat-box p { font-size: 1.5rem; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>pmd-img2url</h1>
-        <p style="text-align: center; margin-top: -10px; color: #999;">Image service for PRABATH-MD by Prabath Kumara</p>
-        
-        <h2>Live Statistics</h2>
-        <div class="stats-grid">
-            <div class="stat-box">
-                <h3>Available Images</h3>
-                <p id="stats-available">--</p>
-            </div>
-            <div class="stat-box">
-                <h3>Auto-Deleted</h3>
-                <p id="stats-deleted">--</p>
-            </div>
-            <div class="stat-box">
-                <h3>Total Uploads</h3>
-                <p id="stats-uploads">--</p>
-            </div>
-            <div class="stat-box">
-                <h3>Total Views</h3>
-                <p id="stats-views">--</p>
-            </div>
-        </div>
 
-        <h2 style="margin-top: 2rem;">Upload Image</h2>
-        <div class="uploader-box">
-            <p>Select a new image (Max 2MB)</p>
-            <form action="/upload" method="POST" enctype="multipart/form-data" id="upload-form">
-                <input type="file" name="file" id="file-input" accept="image/*" required>
-                <button type="submit" id="upload-button">Upload</button>
+    <div class="container">
+        
+        <header>
+            <h1><span>pmd</span>-img2url</h1>
+            <p>Image service for PRABATH-MD by Prabath Kumara</p>
+        </header>
+        
+        <section class="stats-section">
+            <h2>Live Statistics</h2>
+            <div class="stats-grid">
+                
+                <div class="stat-box">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375" />
+                    </svg>
+                    <h3>Available Images</h3>
+                    <p id="stats-available">--</p>
+                </div>
+
+                <div class="stat-box">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12.025 0A48.108 48.108 0 0 1 5.25 6.175m12.3-1.782a48.294 48.294 0 0 1 3.478.397m-15.6 0a48.294 48.294 0 0 0 3.478-.397m12.025 0c.342.052.682.107 1.022.166" />
+                    </svg>
+                    <h3>Auto-Deleted</h3>
+                    <p id="stats-deleted">--</p>
+                </div>
+
+                <div class="stat-box">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                    </svg>
+                    <h3>Total Uploads</h3>
+                    <p id="stats-uploads">--</p>
+                </div>
+
+                <div class="stat-box">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    </svg>
+                    <h3>Total Views</h3>
+                    <p id="stats-views">--</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="uploader-section">
+            <h2>Upload New Image</h2>
+            <form id="upload-form">
+                
+                <label for="file-input" class="drop-zone" id="drop-zone-area">
+                    <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l-3.75 3.75M12 9.75l3.75 3.75M3 13.5V19.5a1.5 1.5 0 0 0 1.5 1.5h15a1.5 1.5 0 0 0 1.5-1.5v-6m-1.5-6H16.5m-10.5 0h.008v.008H6v-.008ZM6 7.5H5.25A2.25 2.25 0 0 0 3 9.75v1.5a2.25 2.25 0 0 0 2.25 2.25h.75m8.25-4.5h-.008v.008H18v-.008Zm.75 4.5h.75a2.25 2.25 0 0 0 2.25-2.25v-1.5a2.25 2.25 0 0 0-2.25-2.25h-.75" />
+                    </svg>
+                    <p>Drag & drop your file here</p>
+                    <span>or click to select (Max 2MB)</span>
+                </label>
+                
+                <input type="file" name="file" id="file-input" accept="image/*">
+                
+                <p id="file-name-display"></p>
+
+                <button type="submit" class="upload-button" id="upload-button" disabled>
+                    <span class="spinner"></span>
+                    <span class="button-text">Upload</span>
+                </button>
+                
             </form>
-            <div id="message-area"></div>
-        </div>
+            
+            <div class="message-area" id="message-area"></div>
+            
+        </section>
+
     </div>
 
     <footer>
-        Created by Prabath Kumara
+        Created by <a href="https://github.com/PRABATH-MD" target="_blank">Prabath Kumara</a>
     </footer>
 
     <script>
+        // --- Get DOM Elements ---
+        const uploadForm = document.getElementById('upload-form');
+        const fileInput = document.getElementById('file-input');
+        const dropZone = document.getElementById('drop-zone-area');
+        const uploadButton = document.getElementById('upload-button');
+        const fileNameDisplay = document.getElementById('file-name-display');
+        const messageArea = document.getElementById('message-area');
+
+        const FILE_SIZE_LIMIT = 2 * 1024 * 1024; // 2MB
+
+        // --- Stats Fetching Function ---
         async function fetchStats() {
             try {
                 const response = await fetch('/stats');
+                if (!response.ok) throw new Error('Stats API failed');
                 const data = await response.json();
+                
                 document.getElementById('stats-available').innerText = data.currentAvailable;
                 document.getElementById('stats-deleted').innerText = data.totalDeletes;
                 document.getElementById('stats-uploads').innerText = data.totalUploads;
                 document.getElementById('stats-views').innerText = data.totalViews;
             } catch (err) {
-                console.error('Failed to fetch stats');
+                console.error('Failed to fetch stats:', err);
+                ['stats-available', 'stats-deleted', 'stats-uploads', 'stats-views'].forEach(id => {
+                    document.getElementById(id).innerText = 'Error';
+                });
             }
         }
 
-        function showUploadMessage() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const messageArea = document.getElementById('message-area');
+        // --- Message Handling ---
+        function showMessage(type, text, url = null) {
+            messageArea.innerHTML = '';
+            const messageEl = document.createElement('div');
+            messageEl.className = `message ${type}`;
             
-            if (urlParams.has('success') && urlParams.has('url')) {
-                const url = urlParams.get('url');
-                messageArea.className = 'message success';
-                messageArea.innerHTML = `Success! URL: <a href="${url}" target="_blank">${url}</a>`;
-            } else if (urlParams.has('error')) {
-                messageArea.className = 'message error';
-                messageArea.innerText = urlParams.get('error');
+            let content = text;
+            if (url) {
+                content += ` <a href="${url}" target="_blank">View URL</a>`;
             }
+            messageEl.innerHTML = content;
+            
+            messageArea.appendChild(messageEl);
         }
         
-        document.getElementById('upload-form').addEventListener('submit', () => {
-             document.getElementById('upload-button').innerText = 'Uploading...';
-             document.getElementById('upload-button').disabled = true;
+        function clearMessage() {
+            messageArea.innerHTML = '';
+        }
+        
+        function handlePageLoadMessage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('success') && urlParams.has('url')) {
+                showMessage('success', 'Upload Successful!', urlParams.get('url'));
+                history.replaceState(null, '', window.location.pathname); // Clear URL params
+            }
+        }
+
+        // --- File Handling & Validation ---
+        function handleFile(file) {
+            clearMessage();
+            if (!file) {
+                fileNameDisplay.textContent = '';
+                uploadButton.disabled = true;
+                return;
+            }
+
+            if (file.size > FILE_SIZE_LIMIT) {
+                showMessage('error', 'File is too large. Limit is 2MB.');
+                fileNameDisplay.textContent = file.name;
+                uploadButton.disabled = true;
+                return;
+            }
+
+            fileNameDisplay.textContent = `Selected: ${file.name}`;
+            uploadButton.disabled = false;
+        }
+
+        // --- Event Listeners ---
+
+        // Drag and Drop
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        ['dragover', 'dragenter'].forEach(eventName => {
+            dropZone.addEventListener(eventName, e => {
+                e.preventDefault();
+                dropZone.classList.add('drag-over');
+            });
         });
 
-        document.getElementById('file-input').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file && file.size > 2 * 1024 * 1024) {
-                 const messageArea = document.getElementById('message-area');
-                 messageArea.className = 'message error';
-                 messageArea.innerText = 'File is too large. Limit is 2MB.';
-                 document.getElementById('upload-button').disabled = true;
-            } else {
-                 const messageArea = document.getElementById('message-area');
-                 messageArea.innerHTML = '';
-                 messageArea.className = '';
-                 document.getElementById('upload-button').disabled = false;
+        ['dragleave', 'dragend', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, e => {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+            });
+        });
+
+        dropZone.addEventListener('drop', e => {
+            const file = e.dataTransfer.files[0];
+            fileInput.files = e.dataTransfer.files; // Sync with hidden input
+            handleFile(file);
+        });
+
+        // File Input Change
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            handleFile(file);
+        });
+
+        // --- AJAX Form Submission (No Page Reload) ---
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Stop page reload
+            clearMessage();
+            
+            const file = fileInput.files[0];
+            if (!file || file.size > FILE_SIZE_LIMIT) {
+                showMessage('error', 'Cannot upload. File is invalid or too large.');
+                return;
+            }
+
+            // Set loading state
+            uploadButton.disabled = true;
+            uploadButton.classList.add('uploading');
+            uploadButton.querySelector('.button-text').textContent = 'Uploading...';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Upload failed');
+                }
+                
+                // Success!
+                showMessage('success', 'Upload Successful!', data.url);
+                fetchStats(); // Refresh stats
+                uploadForm.reset(); // Clear the form
+                fileNameDisplay.textContent = '';
+
+            } catch (err) {
+                showMessage('error', err.message || 'An unknown error occurred.');
+            } finally {
+                // Reset button state
+                uploadButton.disabled = false;
+                uploadButton.classList.remove('uploading');
+                uploadButton.querySelector('.button-text').textContent = 'Upload';
             }
         });
 
+        // --- Initial Load ---
         fetchStats();
-        showUploadMessage();
+        handlePageLoadMessage();
     </script>
 </body>
 </html>
