@@ -16,7 +16,7 @@
             --bg-black: #000000;
             --bg-primary: #0A0A0A;
             --bg-secondary: #111111;
-            --border-color: #222222;
+            --border-color: rgba(255, 255, 255, 0.1);
             --text-primary: #EAEAEA;
             --text-secondary: #888888;
             --accent-blue: #3B82F6;
@@ -28,6 +28,9 @@
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-black);
+            background-image: radial-gradient(circle at 25% 25%, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0) 50%),
+                              radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0) 50%);
+            background-attachment: fixed;
             color: var(--text-primary);
             display: flex;
             flex-direction: column;
@@ -40,12 +43,14 @@
         .container {
             width: 100%;
             max-width: 650px;
-            background: var(--bg-primary);
+            background: rgba(16, 16, 16, 0.7);
             border-radius: 16px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 25px 50px -12px rgba(255, 255, 255, 0.03);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             margin-bottom: 2rem;
             overflow: hidden;
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
         }
         header {
             padding: 2rem 2rem 1.5rem 2rem;
@@ -80,11 +85,11 @@
         }
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 1rem;
         }
         .stat-box {
-            background: var(--bg-secondary);
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border-color);
             padding: 1.25rem;
             border-radius: 12px;
@@ -132,12 +137,12 @@
             justify-content: center;
             text-align: center;
             cursor: pointer;
-            background: var(--bg-secondary);
+            background: rgba(255, 255, 255, 0.05);
             transition: all 0.3s ease;
         }
         .drop-zone.drag-over {
             border-color: var(--accent-blue);
-            background: rgba(59, 130, 246, 0.05);
+            background: rgba(59, 130, 246, 0.1);
         }
         .drop-zone i {
             width: 36px; height: 36px;
@@ -179,22 +184,42 @@
             padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.9rem;
             font-weight: 500; display: none; word-break: break-all;
         }
-        .message.success {
-            background: rgba(34, 197, 94, 0.1); color: var(--accent-green);
-            border: 1px solid rgba(34, 197, 94, 0.5);
-            display: flex; justify-content: space-between; align-items: center; text-align: left;
-        }
         .message.error {
             background: rgba(239, 68, 68, 0.1); color: var(--accent-red);
             border: 1px solid rgba(239, 68, 68, 0.5); display: block;
         }
-        .message .copy-button {
-            background: var(--accent-green); color: var(--bg-black); border: none;
-            border-radius: 4px; padding: 0.4rem 0.8rem; font-size: 0.8rem;
-            font-weight: 600; cursor: pointer; margin-left: 1rem;
-            transition: background 0.2s ease;
+
+        /* === 1. අලුත් "Liquid Glass" Copy Box එක === */
+        .url-copy-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
-        .message .copy-button:hover { background: #16A34A; }
+        .url-copy-box:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .url-copy-box span {
+            font-family: "SFMono-Regular", Consolas, monospace;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .url-copy-box .copy-status {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-left: 1rem;
+        }
         
         .api-section h3 { font-size: 1rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; }
         .api-section p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem; }
@@ -264,14 +289,14 @@
                 <h2>API for Developers</h2>
                 <h3>Upload Endpoint</h3>
                 <p>Send a `multipart/form-data` request to the endpoint below with a field named `file` (max 2MB).</p>
-                <pre><code><span class="keyword">POST</span> <span id="api-upload-url"></span></code></pre>
+                <pre><code><span class="keyword">POST</span> <span id="api-upload-url">...</span></code></pre>
 
                 <h3>JavaScript Example</h3>
                 <pre><code><span class="comment">// Example: JavaScript Fetch</span>
 <span class="keyword">const</span> <span class="variable">formData</span> = <span class="keyword">new</span> FormData();
 <span class="variable">formData</span>.append(<span class="string">'file'</span>, <span class="variable">yourFileObject</span>);
 
-<span class="keyword">const</span> <span class="variable">response</span> = <span class="keyword">await</span> fetch(<span class="string" id="api-fetch-url"></span>, {
+<span class="keyword">const</span> <span class="variable">response</span> = <span class="keyword">await</span> fetch(<span class="string" id="api-fetch-url">...</span>, {
   method: <span class="string">'POST'</span>,
   body: <span class="variable">formData</span>
 });
@@ -294,7 +319,7 @@
     </footer>
 
     <script>
-                document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', () => {
         
             const uploadForm = document.getElementById('upload-form');
             const fileInput = document.getElementById('file-input');
@@ -309,19 +334,19 @@
             const API_ENDPOINT = `${window.location.origin}/upload`;
 
             function formatNumber(num) {
-                if (num < 1000) return num;
+                if (num < 1000) return String(num);
                 if (num < 1000000) return (num / 1000).toFixed(1).replace('.0', '') + 'K';
                 if (num < 1000000000) return (num / 1000000).toFixed(1).replace('.0', '') + 'M';
                 return (num / 1000000000).toFixed(1).replace('.0', '') + 'B';
             }
 
             function formatBytes(bytes, decimals = 2) {
-                if (bytes === 0) return '0 Bytes';
+                if (!+bytes) return '0 Bytes';
                 const k = 1024;
                 const dm = decimals < 0 ? 0 : decimals;
                 const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
                 const i = Math.floor(Math.log(bytes) / Math.log(k));
-                return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+                return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
             }
 
             async function fetchStats() {
@@ -343,33 +368,31 @@
                 } catch (err) { console.error('Failed to fetch stats:', err); }
             }
 
-            function copyToClipboard(text, buttonEl) {
+            function copyToClipboard(text, statusEl) {
                 navigator.clipboard.writeText(text).then(() => {
-                    buttonEl.textContent = 'Copied!';
-                    setTimeout(() => { buttonEl.textContent = 'Copy URL'; }, 2000);
+                    statusEl.textContent = 'Copied!';
+                    setTimeout(() => { statusEl.textContent = 'Click to Copy'; }, 2000);
                 }, (err) => {
-                    buttonEl.textContent = 'Error';
+                    statusEl.textContent = 'Error!';
                 });
             }
 
             function showMessage(type, text, url = null) {
                 messageArea.innerHTML = '';
                 const messageEl = document.createElement('div');
-                messageEl.className = `message ${type}`;
                 
-                let content = `<span>${text}</span>`;
-                if (url) {
-                    content = `<span>Success! <a href="${url}" target="_blank" style="color: var(--text-primary); text-decoration: none; word-break: break-all;">${url}</a></span>
-                               <button class="copy-button" data-url="${url}">Copy URL</button>`;
-                }
-                messageEl.innerHTML = content;
-                messageArea.appendChild(messageEl);
-
-                if (url) {
-                    messageEl.querySelector('.copy-button').addEventListener('click', (e) => {
-                        copyToClipboard(e.target.dataset.url, e.target);
+                if (type === 'success' && url) {
+                    messageEl.className = 'url-copy-box';
+                    messageEl.innerHTML = `<span>${url}</span><span class="copy-status">Click to Copy</span>`;
+                    messageEl.addEventListener('click', () => {
+                        copyToClipboard(url, messageEl.querySelector('.copy-status'));
                     });
+                } else {
+                    messageEl.className = `message ${type}`;
+                    messageEl.textContent = text;
                 }
+                
+                messageArea.appendChild(messageEl);
             }
             
             function clearMessage() { messageArea.innerHTML = ''; }
@@ -435,12 +458,11 @@
             
             function initApiDocs() {
                 document.getElementById('api-upload-url').textContent = API_ENDPOINT;
-                document.getElementById('api-fetch-url').textContent = API_ENDPOINT;
+                document.getElementById('api-fetch-url').textContent = `'${API_ENDPOINT}'`;
             }
 
             lucide.createIcons();
             
-
             fetchStats();
             initApiDocs();
         
