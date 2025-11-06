@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/lucide.min.js"></script>
+
     <style>
         :root {
             --bg-black: #000000;
@@ -23,6 +25,7 @@
             --accent-green: #22C55E;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-black);
@@ -188,39 +191,6 @@
             background: rgba(239, 68, 68, 0.1); color: var(--accent-red);
             border: 1px solid rgba(239, 68, 68, 0.5); display: block;
         }
-        .message-success-text {
-            color: var(--accent-green);
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        .url-copy-box {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .url-copy-box:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        .url-copy-box span {
-            font-family: "SFMono-Regular", Consolas, monospace;
-            font-size: 0.85rem;
-            color: var(--text-primary);
-            word-break: break-all;
-        }
-        .url-copy-box .copy-status {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
         
         .api-section h3 { font-size: 1rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; }
         .api-section p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem; }
@@ -239,6 +209,67 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-decoration: none; font-weight: 600;
+        }
+
+        /* === අලුත් Popup Modal Style === */
+        #popup-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        #popup-modal {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        #close-modal-btn {
+            position: absolute;
+            top: 0.75rem; right: 0.75rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            border-radius: 50%;
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        #close-modal-btn:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        #popup-modal h2 {
+            margin-top: 0;
+            padding-bottom: 0.75rem;
+            color: var(--accent-green);
+        }
+        #popup-url-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            background: var(--bg-black);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-family: "SFMono-Regular", Consolas, monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+        #popup-copy-btn {
+            margin-top: 1rem;
+            background: var(--accent-green);
+            color: var(--bg-black);
         }
     </style>
 </head>
@@ -341,8 +372,24 @@
         Created by <a href="https://md.prabath.site" target="_blank">Prabath Kumara</a>
     </footer>
 
+    <div id="popup-overlay">
+        <div id="popup-modal">
+            <button id="close-modal-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            <h2 id="popup-title">Image Uploaded</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: -10px; margin-bottom: 1rem;">URL successfully generated and ready to use.</p>
+            <input type="text" id="popup-url-input" readonly>
+            <button class="upload-button" id="popup-copy-btn">
+                <span class="button-text">Copy URL</span>
+            </button>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            
+            lucide.createIcons();
             
             const uploadForm = document.getElementById('upload-form');
             const fileInput = document.getElementById('file-input');
@@ -350,6 +397,12 @@
             const uploadButton = document.getElementById('upload-button');
             const fileNameDisplay = document.getElementById('file-name-display');
             const messageArea = document.getElementById('message-area');
+            
+            const popupOverlay = document.getElementById('popup-overlay');
+            const popupModal = document.getElementById('popup-modal');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const popupUrlInput = document.getElementById('popup-url-input');
+            const popupCopyBtn = document.getElementById('popup-copy-btn');
             
             const FILE_SIZE_LIMIT = 2 * 1024 * 1024;
             const STORAGE_LIMIT_BYTES = 10 * 1024 * 1024 * 1024;
@@ -392,17 +445,17 @@
                 } catch (err) { console.error('Failed to fetch stats:', err); }
             }
 
-            function copyToClipboard(text, statusEl) {
+            function copyToClipboard(text, buttonEl) {
                 navigator.clipboard.writeText(text).then(() => {
-                    statusEl.textContent = 'Copied!';
-                    statusEl.style.color = 'var(--accent-green)';
+                    buttonEl.querySelector('.button-text').textContent = 'Copied!';
+                    buttonEl.style.background = 'var(--accent-green)';
                     setTimeout(() => { 
-                        statusEl.textContent = 'Click to Copy';
-                        statusEl.style.color = 'var(--text-secondary)';
+                        buttonEl.querySelector('.button-text').textContent = 'Copy URL';
+                        buttonEl.style.background = '';
                     }, 2000);
                 }, (err) => {
-                    statusEl.textContent = 'Error!';
-                    statusEl.style.color = 'var(--accent-red)';
+                    buttonEl.querySelector('.button-text').textContent = 'Error!';
+                    buttonEl.style.background = 'var(--accent-red)';
                 });
             }
 
@@ -410,20 +463,8 @@
                 messageArea.innerHTML = '';
                 
                 if (type === 'success' && url) {
-                    const successText = document.createElement('p');
-                    successText.className = 'message-success-text';
-                    successText.textContent = text || 'Image uploaded.';
-                    
-                    const messageEl = document.createElement('div');
-                    messageEl.className = 'url-copy-box';
-                    messageEl.innerHTML = `<span>${url}</span><span class="copy-status">Click to Copy</span>`;
-                    messageEl.addEventListener('click', () => {
-                        copyToClipboard(url, messageEl.querySelector('.copy-status'));
-                    });
-                    
-                    messageArea.appendChild(successText);
-                    messageArea.appendChild(messageEl);
-                    
+                    popupUrlInput.value = url;
+                    popupOverlay.style.display = 'flex';
                 } else if (type === 'error') {
                     const messageEl = document.createElement('div');
                     messageEl.className = 'message error';
@@ -491,6 +532,14 @@
                     uploadButton.classList.remove('uploading');
                     uploadButton.querySelector('.button-text').textContent = 'Upload Image';
                 }
+            });
+            
+            closeModalBtn.addEventListener('click', () => {
+                popupOverlay.style.display = 'none';
+            });
+            
+            popupCopyBtn.addEventListener('click', () => {
+                copyToClipboard(popupUrlInput.value, popupCopyBtn);
             });
             
             function initApiDocs() {
